@@ -1,0 +1,6 @@
+{
+  "name": "CardsContainer",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./CardsContainer.js"
+}

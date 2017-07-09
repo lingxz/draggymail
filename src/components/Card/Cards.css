@@ -1,0 +1,17 @@
+.root {
+	overflow-y: auto;
+	height: 100%;
+	padding-bottom: 20px;
+}
+
+.root .placeholder, .root .placeholder:hover {
+	height: 161px;
+	background-color: rgba(208,208,208,1);
+	width: 90%;
+	margin: 0 auto 10px;
+	/*background: #fff;*/
+	border-radius: 5px;
+	/*box-shadow: 1px 1px 1px rgba(0,0,0,.3);*/
+	transition: 0.15s;
+	cursor: pointer;
+}
