@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
+import { Record, fromJS } from "immutable"
 import rootReducer from '../reducers';
 import createHelpers from './createHelpers';
 import createLogger from './logger';
@@ -28,7 +29,7 @@ export default function configureStore(initialState, helpersConfig) {
   }
 
   // See https://github.com/rackt/redux/releases/tag/v3.1.0
-  const store = createStore(rootReducer, initialState, enhancer);
+  const store = createStore(rootReducer, fromJS(initialState), enhancer);
 
   // Hot reload reducers (requires Webpack or Browserify HMR to be enabled)
   if (__DEV__ && module.hot) {

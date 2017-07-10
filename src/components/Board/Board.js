@@ -12,7 +12,7 @@ import CustomDragLayer from './CustomDragLayer';
 
 function mapStateToProps(state) {
   return {
-    lists: state.lists.lists,
+    lists: state.lists.lists.toJS(),
   };
 }
 

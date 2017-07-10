@@ -18,6 +18,9 @@
 /*
  * Base styles
  * ========================================================================== */
+* {
+  box-sizing: border-box;
+}
 
 html {
   color: #222;
@@ -189,14 +192,13 @@ textarea {
   }
 }
 
-
 .root {
 	padding: 50px 10px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	height: 100%;
 	white-space: nowrap;
 	clear: both;
+  height: 100vh;
 }
 
 .root:after, .root:before {
