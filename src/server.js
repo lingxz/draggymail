@@ -18,6 +18,8 @@ import nodeFetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
+import session from 'express-session'
+
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
@@ -67,7 +69,16 @@ app.use(bodyParser.json());
 //   next(err);
 // });
 
+app.use(session({
+  secret: 'secret!!',
+  resave: false,
+  saveUnitialized: false,
+  cookie: {
+    maxAge: 60 * 60 * 24 * 180 * 1000,
+  }
+}));
 app.use(passport.initialize());
+app.use(passport.session());
 
 if (__DEV__) {
   app.enable('trust proxy');
@@ -77,13 +88,13 @@ app.get('/login/google',
     'https://www.googleapis.com/auth/plus.login',
     'https://www.googleapis.com/auth/plus.profile.emails.read',
     'https://www.googleapis.com/auth/gmail.readonly',
-  ]})
+  ], session: true })
 );
 
 app.get('/login/google/return',
   passport.authenticate('google', {
     failureRedirect: '/login',
-    session: false,
+    session: true,
   }),
   (req, res) => {
     const user = {
@@ -128,6 +139,14 @@ app.get('*', async (req, res, next) => {
       fetch,
       // I should not use `history` on server.. but how I do redirection? follow universal-router
     });
+    console.log("user!!!==========")
+    console.log(req.isAuthenticated())
+    console.log(req.user);
+    // console.log(req.session.passport.user);
+    console.log(req.session);
+    // if (req.user) {
+    //   store.dispatch(login(req.user))
+    // }
 
     // store.dispatch(setRuntimeVariable({
     //   name: 'initialNow',

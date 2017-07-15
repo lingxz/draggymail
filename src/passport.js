@@ -124,4 +124,30 @@ passport.use(new GoogleStrategy({
   fooBar().catch(done);
 }))
 
+
+passport.serializeUser(function(user, done) {
+  console.log('serializing user: ');
+  console.log(user.id);
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  // const user = {
+  //   id: 'deserialized',
+  // }
+  // done(null, user);
+  console.log("this is the id");
+  console.log(id)
+  // User.findById(id, function(err, user) {
+  //   console.log("user found!!");
+  //   done(err, user);
+  // });
+
+
+  // const user = User.findOne({
+  //   attributes: ['id', 'email'],
+  //   where: { id: id },
+  // })
+  done(null, {id: id});
+});
 export default passport;
