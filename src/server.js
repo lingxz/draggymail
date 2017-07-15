@@ -52,11 +52,11 @@ app.use(bodyParser.json());
 //
 // Authentication
 // -----------------------------------------------------------------------------
-app.use(expressJwt({
-  secret: config.auth.jwt.secret,
-  credentialsRequired: false,
-  getToken: req => req.cookies.id_token,
-}));
+// app.use(expressJwt({
+//   secret: config.auth.jwt.secret,
+//   credentialsRequired: false,
+//   getToken: req => req.cookies.id_token,
+// }));
 // Error handler for express-jwt
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   if (err instanceof Jwt401Error) {
@@ -72,6 +72,28 @@ app.use(passport.initialize());
 if (__DEV__) {
   app.enable('trust proxy');
 }
+app.get('/login/google',
+  passport.authenticate('google', { scope: [
+    'https://www.googleapis.com/auth/plus.login',
+    'https://www.googleapis.com/auth/plus.profile.emails.read',
+    'https://www.googleapis.com/auth/gmail.readonly',
+  ]})
+);
+
+app.get('/login/google/return',
+  passport.authenticate('google', {
+    failureRedirect: '/login',
+    session: false,
+  }),
+  (req, res) => {
+    const user = {
+      id: req.user.id,
+      email: req.user.email,
+    };
+    res.redirect('/kanban');
+  }
+)
+
 app.get('/login/facebook',
   passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false }),
 );
@@ -110,7 +132,7 @@ app.get('*', async (req, res, next) => {
 
     const initialState = {
       // user: req.user || null,
-      user: "blabla",
+      // user: "blabla",
     };
 
 
