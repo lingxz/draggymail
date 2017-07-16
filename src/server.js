@@ -106,6 +106,12 @@ app.get('/login/google/return',
   }
 )
 
+app.post('/logout', (req, res) => {
+  req.user = null;
+  req.logOut();
+  req.session.destroy();
+  res.redirect('/login');
+});
 
 //
 // Register API middleware
