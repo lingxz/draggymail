@@ -31,7 +31,8 @@ import models from './data/models';
 import schema from './data/schema';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
-import { setRuntimeVariable } from './actions/runtime';
+// import { setRuntimeVariable } from './actions/runtime';
+import { login } from './actions/user';
 import config from './config';
 
 const app = express();
@@ -129,10 +130,7 @@ app.get('*', async (req, res, next) => {
       cookie: req.headers.cookie,
     });
 
-    const initialState = {
-      // user: req.user || null,
-      // user: "blabla",
-    };
+    const initialState = {};
 
 
     const store = configureStore(initialState, {
@@ -144,9 +142,9 @@ app.get('*', async (req, res, next) => {
     console.log(req.user);
     // console.log(req.session.passport.user);
     console.log(req.session);
-    // if (req.user) {
-    //   store.dispatch(login(req.user))
-    // }
+    if (req.user) {
+      store.dispatch(login(req.user))
+    }
 
     // store.dispatch(setRuntimeVariable({
     //   name: 'initialNow',

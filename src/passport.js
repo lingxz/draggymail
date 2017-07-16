@@ -67,6 +67,7 @@ passport.use(new GoogleStrategy({
         done(null, {
           id: user.id,
           email: user.email,
+          accessToken: accessToken,
         });
       }
     } else {
@@ -83,7 +84,11 @@ passport.use(new GoogleStrategy({
         ],
       });
       if (users.length) {
-        done(null, users[0]);
+        done(null, {
+          id: users[0].id,
+          email: users[0].email,
+          accessToken: accessToken,
+        });
       } else {
         let user = await User.findOne({ where: { email: profile._json.email } });
         if (user) {
@@ -115,6 +120,7 @@ passport.use(new GoogleStrategy({
           done(null, {
             id: user.id,
             email: user.email,
+            accessToken: accessToken,
           });
         }
       }
@@ -127,27 +133,10 @@ passport.use(new GoogleStrategy({
 
 passport.serializeUser(function(user, done) {
   console.log('serializing user: ');
-  console.log(user.id);
-  done(null, user.id);
+  done(null, user)
 });
 
-passport.deserializeUser(function(id, done) {
-  // const user = {
-  //   id: 'deserialized',
-  // }
-  // done(null, user);
-  console.log("this is the id");
-  console.log(id)
-  // User.findById(id, function(err, user) {
-  //   console.log("user found!!");
-  //   done(err, user);
-  // });
-
-
-  // const user = User.findOne({
-  //   attributes: ['id', 'email'],
-  //   where: { id: id },
-  // })
-  done(null, {id: id});
+passport.deserializeUser(function(user, done) {
+  done(null, user);
 });
 export default passport;

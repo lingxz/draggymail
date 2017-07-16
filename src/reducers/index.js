@@ -4,7 +4,6 @@ import runtime from './runtime';
 import lists from './lists';
 
 export default combineReducers({
-  // user,
-  // runtime,
+  user,
   lists,
 });
