@@ -13,3 +13,9 @@ export function logout() { // redux action
 export function login(user) {
   return ({ type: USER_LOGIN, user })
 }
+
+// export function logout() {
+//   fetch('/logout', { method: 'POST', credentials: 'same-origin' })
+//     .then(() => return ({ type: USER_LOGOUT, error: false }))
+//     .catch(error => return ({ }))
+// }
