@@ -9,7 +9,7 @@ const listSource = {
   beginDrag(props) {
     return {
       id: props.id,
-      x: props.x
+      x: props.x,
     };
   },
   endDrag(props) {
@@ -63,6 +63,7 @@ class CardsContainer extends React.Component {
     connectDropTarget: PropTypes.func.isRequired,
     connectDragSource: PropTypes.func.isRequired,
     item: PropTypes.object,
+    labelId: PropTypes.string.isRequired,
     x: PropTypes.number,
     moveCard: PropTypes.func.isRequired,
     moveList: PropTypes.func.isRequired,
@@ -74,7 +75,7 @@ class CardsContainer extends React.Component {
 
 
 	render() {
-    const { connectDropTarget, connectDragSource, item, x, moveCard, isDragging } = this.props;
+    const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging } = this.props;
 	  return connectDragSource(connectDropTarget(
       <div className={s.root}>
         <div className={s.head}>
@@ -82,6 +83,7 @@ class CardsContainer extends React.Component {
         </div>
         <div className={s.items}>
           <Cards
+            labelId={labelId}
             moveCard={moveCard}
             x={x}
             cards={item.emails}

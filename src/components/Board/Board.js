@@ -11,11 +11,11 @@ import * as ListsActions from '../../actions/lists';
 import CustomDragLayer from './CustomDragLayer';
 
 function mapStateToProps(state) {
-  const mailbox = state.toJS().mailbox;
+  const jsState = state.toJS();
   return {
-    user: state.toJS().user,
-    lists: Object.keys(mailbox).map(key => mailbox[key]),
-    // lists: state.toJS().lists.lists,
+    user: jsState.user,
+    labelsToShow: jsState.labels.labelsToShow,
+    mailbox: jsState.mailbox,
   };
 }
 
@@ -26,8 +26,8 @@ function mapDispatchToProps(dispatch) {
 class Board extends React.Component {
 
   static propTypes = {
-    getEmails: PropTypes.func.isRequired,
-    lists: PropTypes.array.isRequired,
+    labelsToShow: PropTypes.array.isRequired,
+    mailbox: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
   }
 
@@ -86,29 +86,24 @@ class Board extends React.Component {
   }
 
   findList(id) {
-    const { lists } = this.props;
-    const list = lists.filter(l => l.id === id)[0];
+    const { mailbox, labelsToShow } = this.props;
 
     return {
-      list,
-      lastX: lists.indexOf(list)
+      lists: mailbox[id].emails,
+      lastX: labelsToShow.indexOf(id)
     };
   }
 
-  // componentWillMount() {
-  //   this.props.getEmails(this.props.user);
-  // }
-
   render() {
-    const { lists } = this.props;
+    const { mailbox, labelsToShow } = this.props;
     return (
       <div className={s.root}>
         <CustomDragLayer snapToGrid={false} />
-        {lists.map((item, i) =>
+        {labelsToShow.map((item, i) =>
           <CardsContainer
-            key={item.id}
-            id={item.id}
-            item={item}
+            key={mailbox[item].id}
+            labelId={mailbox[item].id}
+            item={mailbox[item]}
             moveCard={this.moveCard}
             moveList={this.moveList}
             startScrolling={this.startScrolling}

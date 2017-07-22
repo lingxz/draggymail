@@ -24,23 +24,15 @@ function getPlaceholderIndex(y, scrollY) {
 const specs = {
   drop(props, monitor, component) {
     document.getElementById(monitor.getItem().id).style.display = 'block';
-    const { placeholderIndex } = component.state;
-    const lastX = monitor.getItem().x;
     const lastY = monitor.getItem().y;
-    const nextX = props.x;
-    let nextY = placeholderIndex;
 
-    if (lastY > nextY) { // move top
-      nextY += 1;
-    } else if (lastX !== nextX) { // insert into another list
-      nextY += 1;
-    }
+    const lastLabelId = monitor.getItem().labelId;
+    const nextLabelId = props.labelId;
 
-    if (lastX === nextX && lastY === nextY) { // if position equel
+    if (lastLabelId === nextLabelId) { // if no move
       return;
     }
-
-    props.moveCard(lastX, lastY, nextX, nextY);
+    props.moveCard(lastLabelId, nextLabelId, lastY);
   },
   hover(props, monitor, component) {
     // defines where placeholder is rendered
@@ -93,6 +85,7 @@ class Cards extends React.Component {
     connectDropTarget: PropTypes.func.isRequired,
     moveCard: PropTypes.func.isRequired,
     cards: PropTypes.array.isRequired,
+    labelId: PropTypes.string.isRequired,
     x: PropTypes.number.isRequired,
     isOver: PropTypes.bool,
     item: PropTypes.object,
@@ -111,7 +104,7 @@ class Cards extends React.Component {
   }
 
   render() {
-    const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
+    const { connectDropTarget, x, cards, labelId, isOver, canDrop } = this.props;
     const { placeholderIndex } = this.state;
 
     let isPlaceHold = false;
@@ -127,7 +120,10 @@ class Cards extends React.Component {
       }
       if (item !== undefined) {
         cardList.push(
-          <Card x={x} y={i}
+          <Card
+            labelId={labelId}
+            x={x}
+            y={i}
             item={item}
             key={item.id}
             stopScrolling={this.props.stopScrolling}

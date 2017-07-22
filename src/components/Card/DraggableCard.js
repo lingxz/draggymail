@@ -15,11 +15,11 @@ function getStyles(isDragging) {
 const cardSource = {
   beginDrag(props, monitor, component) {
     // dispatch to redux store that drag is started
-    const { item, x, y } = props;
+    const { item, labelId, x, y } = props;
     const { id, title } = item;
     const { clientWidth, clientHeight } = findDOMNode(component);
 
-    return { id, title, item, x, y, clientWidth, clientHeight };
+    return { id, title, labelId, item, x, y, clientWidth, clientHeight };
   },
   // endDrag(props, monitor) {
   //   document.getElementById(monitor.getItem().id).style.display = 'block';
@@ -42,6 +42,7 @@ function collectDragSource(connectDragSource, monitor) {
 class DraggableCard extends React.Component {
 
   static propTypes = {
+    labelId: PropTypes.string.isRequired,
     item: PropTypes.object,
     connectDragSource: PropTypes.func.isRequired,
     isDragging: PropTypes.bool.isRequired,

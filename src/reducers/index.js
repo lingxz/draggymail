@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux-immutable';
 import user from './user';
 import runtime from './runtime';
-import lists from './lists';
 import mailbox from './mailbox';
+import labels from './labels';
 
 export default combineReducers({
   user,
-  lists,
+  labels,
   mailbox,
 });

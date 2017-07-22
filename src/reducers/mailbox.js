@@ -14,12 +14,60 @@ import {
   GET_MAILBOX_LABEL_INFO_START,
   GET_MAILBOX_LABEL_INFO_SUCCESS,
   GET_MAILBOX_LABEL_INFO_FAILURE,
+  MOVE_CARD,
 } from '../constants';
+
+function getInsertIndexByDate(array, date) {
+    var low = 0,
+        high = array.length;
+
+    while (low < high) {
+        var mid = (low + high) >>> 1;
+        if (array[mid].date < date) { low = mid + 1; }
+        else { high = mid; }
+    }
+    return low;
+}
 
 const initialState = new Map();
 
 export default function mailbox(state = initialState, action) {
   switch (action.type) {
+    case MOVE_CARD: {
+      const { lastLabelId, nextLabelId, lastY } = action;
+      if (lastLabelId === nextLabelId) {
+        return state;
+      } else {
+        const nextLane = state.toJS()[nextLabelId].emails;
+        const lastLane = state.toJS()[lastLabelId].emails;
+
+        // move element to new place
+        const insertionIndex = getInsertIndexByDate(nextLane, lastLane[lastY].date);
+        nextLane.splice(insertionIndex, 0, lastLane[lastY])
+        //delete element from old place
+        lastLane.splice(lastY, 1);
+        return state.withMutations((ctx) => {
+          ctx.setIn([lastLabelId, 'emails'], fromJS(lastLane))
+          ctx.setIn([nextLabelId, 'emails'], fromJS(nextLane))
+        })
+      }
+    }
+    case MOVE_CARD: {
+      const newLists = [...state.toJS().lists];
+      const { lastLabelId, nextLabelId } = action;
+      const { lastX, lastY, nextX, nextY } = action;
+      if (lastX === nextX) {
+        newLists[lastX].cards.splice(nextY, 0, newLists[lastX].cards.splice(lastY, 1)[0]);
+      } else {
+        // move element to new place
+        newLists[nextX].cards.splice(nextY, 0, newLists[lastX].cards[lastY]);
+        // delete element from old place
+        newLists[lastX].cards.splice(lastY, 1);
+      }
+      return state.withMutations((ctx) => {
+        ctx.set('lists', fromJS(newLists));
+      });
+    }
     case SYNC_MAILBOX_LABEL_START:
       return state.setIn([action.labelId, 'isFetching'], true)
     case SYNC_MAILBOX_LABEL_FAILURE:

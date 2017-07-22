@@ -63,6 +63,7 @@ export function formatEmail(email) {
     snippet: email.snippet,
     threadId: email.threadId,
     labelIds: email.labelIds,
+    date: email.internalDate,
   }
 }
 
@@ -77,7 +78,7 @@ function processEmails(emails) {
 
 export function fullSyncMailBoxLabel(user, label) {
   const params = {
-    labelIds: [label.id]
+    labelIds: label.id
   }
 
   const queryString = getQueryString(params);
@@ -106,23 +107,51 @@ export function fullSyncMailBoxLabelAction(user, label) {
   }
 }
 
-export function fullSyncMultipleLabels(user, labelIds) {
-  const params = {
-    labelIds: labelIds,
-  };
+// export function fullSyncMultipleLabels(user, labelIds) {
+//   const params = {
+//     labelIds: labelIds,
+//   };
 
-  const queryString = getQueryString(params);
-  console.log(queryString);
-  return GmailActions.fetchMessageIds(user, "?" + queryString)
+//   const queryString = getQueryString(params);
+//   return GmailActions.fetchMessageIds(user, "?" + queryString)
+//     .then(data => {
+//       let messageIds = [];
+//       for (var i = 0; i < data.messages.length; i++) {
+//         messageIds.push(data.messages[i].id)
+//       }
+//       return messageIds;
+//     })
+//     .then(messageIds => GmailActions.fetchManyMessages(user, messageIds))
+//     .then(emails => sortEmails(emails, labelIds))
+// }
+
+export function fullSyncMultipleLabels(user, labelIds) {
+  let allFetches = [];
+  for (var i = 0; i < labelIds.length; i++) {
+    let param = {
+      labelIds: labelIds[i],
+    };
+    let queryString = getQueryString(param);
+    let messageFetch = GmailActions.fetchMessageIds(user, "?" + queryString)
+      .then(data => {
+        if (data.messages === undefined) { return []; }
+        let messageIds = [];
+        for (var i = 0; i < data.messages.length; i++) {
+          messageIds.push(data.messages[i].id)
+        }
+        return messageIds;
+      })
+      .then(messageIds => GmailActions.fetchManyMessages(user, messageIds))
+    allFetches.push(messageFetch);
+  }
+  return Promise.all(allFetches)
     .then(data => {
-      let messageIds = [];
-      for (var i = 0; i < data.messages.length; i++) {
-        messageIds.push(data.messages[i].id)
+      const labelsMap = {};
+      for (var i = 0; i < data.length; i++) {
+        labelsMap[labelIds[i]] = data[i].map(email => formatEmail(email));
       }
-      return messageIds;
+      return labelsMap;
     })
-    .then(messageIds => GmailActions.fetchManyMessages(user, messageIds))
-    .then(emails => sortEmails(emails, labelIds))
 }
 
 export function fullSyncAllLabels(user, labelIds) {
