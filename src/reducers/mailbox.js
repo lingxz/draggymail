@@ -1,13 +1,6 @@
 import { fromJS, Map } from 'immutable';
 import {
   CLEAR_MAILBOX,
-  // SYNC_MAILBOX_PROFILE,
-  // SYNC_MAILBOX_PROFILE_SUCCESS,
-  // SYNC_MAILBOX_PROFILE_FAILURE,
-  // SET_GOOGLE_LABEL_INFO,
-  // SET_GOOGLE_LATEST_UNREAD_THREADS,
-  // SET_GOOGLE_AUTH,
-  // SET_MAILBOX,
   SYNC_MAILBOX_LABEL_START,
   SYNC_MAILBOX_LABEL_SUCCESS,
   SYNC_MAILBOX_LABEL_FAILURE,
@@ -23,7 +16,7 @@ function getInsertIndexByDate(array, date) {
 
     while (low < high) {
         var mid = (low + high) >>> 1;
-        if (array[mid].date < date) { low = mid + 1; }
+        if (array[mid].date > date) { low = mid + 1; }
         else { high = mid; }
     }
     return low;

@@ -1,7 +1,6 @@
 .root {
 	overflow-y: auto;
 	height: 100%;
-	padding-bottom: 20px;
 }
 
 .root .placeholder, .root .placeholder:hover {
