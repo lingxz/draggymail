@@ -11,7 +11,7 @@ async function action({ store, fetch }) {
 
   const labels = ['INBOX', 'Label_203'];
 
-  await store.dispatch(MailBoxActions.fullSyncAllLabels(user, labels))
+  await store.dispatch(MailBoxActions.fullSyncMultipleLabelsAction(user, labels))
   return {
     chunks: ['kanban'],
     title: 'Emails',

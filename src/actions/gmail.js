@@ -35,6 +35,14 @@ export function fetchMessageIds(user, query) {
     .then(response => response.json())
 }
 
+export function fetchThreadIds(user, query) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/threads";
+  return fetch(url + query, {
+    headers: { "Authorization": "Bearer " + user.accessToken },
+  })
+    .then(response => response.json())
+}
+
 export function fetchThread(user, threadId) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/threads/";
   return fetch(url + threadId, {

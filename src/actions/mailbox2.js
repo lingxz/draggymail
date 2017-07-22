@@ -52,6 +52,26 @@ export function syncLabel(auth, label, forceFullSync) {
   }
 }
 
+export function syncMailBoxLabel(user, label) {
+  return dispatch => {
+    const labelId = label.id;
+    const messagesTotal = label.messagesTotal;
+    const messagesUnread = label.messagesUnread;
+    // this is a cheap call to see if anything changed in the label
+    dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId: label.id })
+    GmailActions.fetchLabelInfo(user, labelId)
+      .then(data => {
+        // update store, decide if we changed
+        dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: label.id, payload: data })
+        return messagesTotal !== data.messagesTotal || messagesUnread !== data.messagesUnread
+      })
+      .then(changed => {
+        if (!changed) {
+
+        }
+      })
+  }
+}
 
 export function syncMailBoxLabel(auth, label, forceFullSync) {
   // call out to google

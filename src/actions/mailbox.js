@@ -76,22 +76,48 @@ function processEmails(emails) {
   return inbox;
 }
 
+function formatThread(thread) {
+  const emails = processEmails(thread.messages)
+  const latestEmail = emails[emails.length - 1]
+  return {
+    id: thread.id,
+    historyId: thread.historyId,
+    date: latestEmail.date,
+    to: latestEmail.to,
+    from: latestEmail.from,
+    snippet: latestEmail.snippet,
+    content: latestEmail.content,
+    subject: latestEmail.subject,
+    labelIds: latestEmail.labelIds,
+    emails: emails,
+  }
+}
+
+function processThreads(threads) {
+  const inbox = [];
+  for (var idx = 0; idx < emails.length; idx++) {
+    var thread = threads[idx];
+    inbox.push(formatThread(thread))
+  }
+  return inbox;
+}
+
 export function fullSyncMailBoxLabel(user, label) {
   const params = {
     labelIds: label.id
   }
 
   const queryString = getQueryString(params);
-  return GmailActions.fetchMessageIds(user, "?" + queryString)
+  return GmailActions.fetchThreadIds(user, "?" + queryString)
     .then(data => {
-      let messageIds = [];
-      for (var i = 0; i < data.messages.length; i++) {
-        messageIds.push(data.messages[i].id)
+      let threadIds = [];
+      for (var i = 0; i < data.threads.length; i++) {
+        messageIds.push(data.threads[i].id)
       }
-      return messageIds;
+      return threadIds;
     })
-    .then(messageIds => GmailActions.fetchManyMessages(user, messageIds))
-    .then(emails => processEmails(emails))
+    .then(threadIds => GmailActions.fetchManyThreads(user, threadIds))
+    .then(threads => processThreads(threads))
 }
 
 export function fullSyncMailBoxLabelAction(user, label) {
@@ -99,31 +125,13 @@ export function fullSyncMailBoxLabelAction(user, label) {
     dispatch({ type: SYNC_MAILBOX_LABEL_START, label })
     try {
       return fullSyncMailBoxLabel(user, label)
-        .then(emails => dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: label.id, emails }))
+        .then(threads => dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: label.id, threads }))
     }
     catch(err) {
       return dispatch({ type: SYNC_MAILBOX_LABEL_FAILURE, labelId: label.id, err })
     }
   }
 }
-
-// export function fullSyncMultipleLabels(user, labelIds) {
-//   const params = {
-//     labelIds: labelIds,
-//   };
-
-//   const queryString = getQueryString(params);
-//   return GmailActions.fetchMessageIds(user, "?" + queryString)
-//     .then(data => {
-//       let messageIds = [];
-//       for (var i = 0; i < data.messages.length; i++) {
-//         messageIds.push(data.messages[i].id)
-//       }
-//       return messageIds;
-//     })
-//     .then(messageIds => GmailActions.fetchManyMessages(user, messageIds))
-//     .then(emails => sortEmails(emails, labelIds))
-// }
 
 export function fullSyncMultipleLabels(user, labelIds) {
   let allFetches = [];
@@ -132,29 +140,29 @@ export function fullSyncMultipleLabels(user, labelIds) {
       labelIds: labelIds[i],
     };
     let queryString = getQueryString(param);
-    let messageFetch = GmailActions.fetchMessageIds(user, "?" + queryString)
+    let threadFetch = GmailActions.fetchThreadIds(user, "?" + queryString)
       .then(data => {
-        if (data.messages === undefined) { return []; }
-        let messageIds = [];
-        for (var i = 0; i < data.messages.length; i++) {
-          messageIds.push(data.messages[i].id)
+        if (data.threads === undefined) { return []; }
+        let threadIds = [];
+        for (var i = 0; i < data.threads.length; i++) {
+          threadIds.push(data.threads[i].id)
         }
-        return messageIds;
+        return threadIds;
       })
-      .then(messageIds => GmailActions.fetchManyMessages(user, messageIds))
-    allFetches.push(messageFetch);
+      .then(threadIds => GmailActions.fetchManyThreads(user, threadIds))
+    allFetches.push(threadFetch);
   }
   return Promise.all(allFetches)
     .then(data => {
       const labelsMap = {};
       for (var i = 0; i < data.length; i++) {
-        labelsMap[labelIds[i]] = data[i].map(email => formatEmail(email));
+        labelsMap[labelIds[i]] = data[i].map(thread => formatThread(thread));
       }
       return labelsMap;
     })
 }
 
-export function fullSyncAllLabels(user, labelIds) {
+export function fullSyncMultipleLabelsAction(user, labelIds) {
   return dispatch => {
     for (var idx = 0; idx < labelIds.length; idx++) {
       dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId: labelIds[idx] })
@@ -173,7 +181,7 @@ export function fullSyncAllLabels(user, labelIds) {
         })
         .then(data => {
           for (var key in data) {
-            dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: key, emails: data[key] })
+            dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: key, threads: data[key] })
           }
         })
     }
@@ -199,3 +207,4 @@ export function getMailBoxLabelInfo(user, labelId) {
     }
   }
 }
+

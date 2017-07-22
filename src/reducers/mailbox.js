@@ -31,35 +31,37 @@ export default function mailbox(state = initialState, action) {
       if (lastLabelId === nextLabelId) {
         return state;
       } else {
-        const nextLane = state.toJS()[nextLabelId].emails;
-        const lastLane = state.toJS()[lastLabelId].emails;
+        const lastLabel = state.toJS()[lastLabelId];
+        const nextLabel = state.toJS()[nextLabelId];
+
+        const nextLane = nextLabel.threads;
+        const lastLane = lastLabel.threads;
 
         // move element to new place
         const insertionIndex = getInsertIndexByDate(nextLane, lastLane[lastY].date);
-        nextLane.splice(insertionIndex, 0, lastLane[lastY])
+        const threadToMove = lastLane[lastY];
+
+        // remove label from element and add new one
+        const threadLabels = threadToMove.labelIds
+        const index = threadLabels.indexOf(lastLabelId)
+        if (index > -1) {
+          threadLabels.splice(index, 1)
+        }
+        threadLabels.push(nextLabelId);
+        threadToMove.labelIds = threadLabels;
+
+        //TODO: need to remove and add label to each email as well
+
+        nextLane.splice(insertionIndex, 0, threadToMove)
         //delete element from old place
         lastLane.splice(lastY, 1);
         return state.withMutations((ctx) => {
-          ctx.setIn([lastLabelId, 'emails'], fromJS(lastLane))
-          ctx.setIn([nextLabelId, 'emails'], fromJS(nextLane))
+          ctx.setIn([lastLabelId, 'threads'], fromJS(lastLane))
+          ctx.setIn([lastLabelId, 'messagesTotal'], lastLabel.messagesTotal - 1)
+          ctx.setIn([nextLabelId, 'threads'], fromJS(nextLane))
+          ctx.setIn([nextLabelId, 'messagesTotal'], nextLabel.messagesTotal + 1)
         })
       }
-    }
-    case MOVE_CARD: {
-      const newLists = [...state.toJS().lists];
-      const { lastLabelId, nextLabelId } = action;
-      const { lastX, lastY, nextX, nextY } = action;
-      if (lastX === nextX) {
-        newLists[lastX].cards.splice(nextY, 0, newLists[lastX].cards.splice(lastY, 1)[0]);
-      } else {
-        // move element to new place
-        newLists[nextX].cards.splice(nextY, 0, newLists[lastX].cards[lastY]);
-        // delete element from old place
-        newLists[lastX].cards.splice(lastY, 1);
-      }
-      return state.withMutations((ctx) => {
-        ctx.set('lists', fromJS(newLists));
-      });
     }
     case SYNC_MAILBOX_LABEL_START:
       return state.setIn([action.labelId, 'isFetching'], true)
@@ -68,7 +70,7 @@ export default function mailbox(state = initialState, action) {
     case SYNC_MAILBOX_LABEL_SUCCESS:
       return state.withMutations((ctx) =>  {
         ctx.setIn([action.labelId, 'isFetching'], false)
-        ctx.setIn([action.labelId, 'emails'], fromJS(action.emails))
+        ctx.setIn([action.labelId, 'threads'], fromJS(action.threads))
       })
     case GET_MAILBOX_LABEL_INFO_START:
       return state.setIn([action.labelId, 'isFetching'], true)

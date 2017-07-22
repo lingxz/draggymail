@@ -10,8 +10,14 @@ class Card extends React.Component {
 	}
 	render() {
 		const { style, item } = this.props;
+
+    let unread = false;
+    if (item.labelIds.indexOf('UNREAD') > -1) {
+      unread = true;
+    }
+
 		return (
-	    <div style={style} className={s.root} id={style ? item.id : null}>
+	    <div style={style} className={unread ? s.unread: s.root} id={style ? item.id : null}>
 	      <div className={s.name}>{item.from}</div>
 	      <div className={s.container}>
 	        <div className={s.content}>
