@@ -24,6 +24,10 @@
   font-weight: 600;
 }
 
+.unread:hover {
+  background: #f7f7f7;
+}
+
 .name {
 	padding: 5px 10px;
   padding-bottom: 0px;

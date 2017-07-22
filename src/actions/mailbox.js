@@ -3,11 +3,35 @@ import {
   SYNC_MAILBOX_LABEL_START,
   SYNC_MAILBOX_LABEL_SUCCESS,
   SYNC_MAILBOX_LABEL_FAILURE,
+  SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE,
   GET_MAILBOX_LABEL_INFO_START,
   GET_MAILBOX_LABEL_INFO_SUCCESS,
   GET_MAILBOX_LABEL_INFO_FAILURE,
+  SYNC_MAILBOX_LATEST_UNREAD_THREADS,
+  GET_LISTS,
+  GET_LISTS_START,
+  MOVE_CARD,
+  MOVE_LIST,
+  TOGGLE_DRAGGING
 } from '../constants';
 
+export function moveList(lastX, nextX) {
+  return (dispatch) => {
+    dispatch({ type: MOVE_LIST, lastX, nextX });
+  };
+}
+
+export function moveCard(lastLabelId, nextLabelId, lastY) {
+  return (dispatch) => {
+    dispatch({ type: MOVE_CARD, lastLabelId, nextLabelId, lastY });
+  };
+}
+
+export function toggleDragging(isDragging) {
+  return (dispatch) => {
+    dispatch({ type: TOGGLE_DRAGGING, isDragging });
+  };
+}
 
 function getQueryString(params) {
   return Object
@@ -95,7 +119,7 @@ function formatThread(thread) {
 
 function processThreads(threads) {
   const inbox = [];
-  for (var idx = 0; idx < emails.length; idx++) {
+  for (var idx = 0; idx < threads.length; idx++) {
     var thread = threads[idx];
     inbox.push(formatThread(thread))
   }
@@ -122,7 +146,7 @@ export function fullSyncMailBoxLabel(user, label) {
 
 export function fullSyncMailBoxLabelAction(user, label) {
   return dispatch => {
-    dispatch({ type: SYNC_MAILBOX_LABEL_START, label })
+    dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id })
     try {
       return fullSyncMailBoxLabel(user, label)
         .then(threads => dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: label.id, threads }))
@@ -208,3 +232,84 @@ export function getMailBoxLabelInfo(user, labelId) {
   }
 }
 
+export function syncMailBoxLabel(user, label) {
+  return dispatch => {
+    dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id })
+    const labelId = label.id;
+    const messagesTotal = label.messagesTotal;
+    const messagesUnread = label.messagesUnread;
+    // this is a cheap call to see if anything changed in the label
+    dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId: label.id })
+    GmailActions.fetchLabelInfo(user, labelId)
+      .then(data => {
+        // update store, decide if we changed
+        dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: label.id, payload: data })
+        return messagesTotal !== data.messagesTotal || messagesUnread !== data.messagesUnread
+      })
+      .then(changed => {
+        console.log("changed???");
+        console.log(changed);
+        if (!changed) {
+          return dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE, labelId: label.id });
+        }
+        const queryString = 'labelIds=UNREAD&labelIds=' + label.id;
+        return GmailActions.fetchThreadIds(user, '?' + queryString)
+      })
+      .then(data => {
+        const threads = data.threads || [];
+        if (threads.length === 0) {
+          return {
+            threads: threads,
+            changedThreads: [],
+          }
+        }
+        const latestUnreadThreads = label.latestUnreadThreads || [];
+        // TODO: store current unread threads
+        const currentThreadsIndex = {};
+        const changedThreads = threads.reduce((acc, thread) => {
+          if (!currentThreadsIndex[thread.id]) {
+            // thread not in the unread list
+            acc.push(thread)
+          } else if (currentThreadsIndex[thread.id].historyId !== thread.historyId) {
+            // thread was previously in unread list but something changed
+            acc.push(thread)
+          } else if ((currentThreadsIndex[thread.id].messages || []).length === 0) {
+            // there are no emails in previously stored thread
+            acc.push(thread)
+          }
+          return acc;
+        }, [])
+        console.log("changed threads!!!!");
+        console.log(changedThreads);
+        return { threads: threads, changedThreads: changedThreads }
+      })
+      .then(({ threads, changedThreads }) => {
+        // grabbed the full threads that were changed
+        if (changedThreads.length === 0) {
+          // unread threads didn't change, but something changed inside the threads
+          // ????? idk anymore
+          return { threads: threads, changedThreads: [] }
+        }
+        const changedThreadIds = changedThreads.map(thread => thread.id)
+        return GmailActions.fetchManyThreads(user, changedThreadIds)
+          .then(changedThreads => {
+            return { threads: threads, changedThreads: changedThreads }
+          })
+      })
+      .then(({ threads, changedThreads }) => {
+        // store the grabbed threads
+        if (changedThreads.length === 0) {
+          return dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE, labelId: label.id });
+        }
+        console.log("latest unread threads!!!");
+        dispatch({ type: SYNC_MAILBOX_LATEST_UNREAD_THREADS, labelId: label.id, threads: processThreads(changedThreads) });
+        return changedThreads;
+      })
+    .then(response => dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: label.id }))
+    .catch(err => {
+      console.log("error!!!!");
+      console.log(err);
+      dispatch({ type: SYNC_MAILBOX_LABEL_FAILURE, labelId: label.id, err })
+    })
+  }
+}

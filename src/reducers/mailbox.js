@@ -4,6 +4,8 @@ import {
   SYNC_MAILBOX_LABEL_START,
   SYNC_MAILBOX_LABEL_SUCCESS,
   SYNC_MAILBOX_LABEL_FAILURE,
+  SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE,
+  SYNC_MAILBOX_LATEST_UNREAD_THREADS,
   GET_MAILBOX_LABEL_INFO_START,
   GET_MAILBOX_LABEL_INFO_SUCCESS,
   GET_MAILBOX_LABEL_INFO_FAILURE,
@@ -67,16 +69,48 @@ export default function mailbox(state = initialState, action) {
       return state.setIn([action.labelId, 'isFetching'], true)
     case SYNC_MAILBOX_LABEL_FAILURE:
       return state.setIn([action.labelId, 'isFetching'], false)
-    case SYNC_MAILBOX_LABEL_SUCCESS:
+    case SYNC_MAILBOX_LABEL_SUCCESS: {
+      if (!action.threads) {
+        return state.withMutations((ctx) => {
+          ctx.setIn([action.labelId, 'isFetching'], false)
+        })
+      }
       return state.withMutations((ctx) =>  {
         ctx.setIn([action.labelId, 'isFetching'], false)
         ctx.setIn([action.labelId, 'threads'], fromJS(action.threads))
+        ctx.setIn([action.labelId, 'latestUnreadThreads'], fromJS(action.latestUnreadThreads || []))
       })
+    }
+    case SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE:
+      return state.setIn([action.labelId, 'isFetching'], false)
+    case SYNC_MAILBOX_LATEST_UNREAD_THREADS: {
+      const changedThreadIds = action.threads.map(item => item.id)
+      const currentThreadList = state.get(action.labelId).get('threads');
+
+      let newThreadList = currentThreadList;
+      for (var i = 0; i < changedThreadIds.length; i++) {
+        let changedIndex = newThreadList.findIndex((item) => {
+          return item.get('id') === changedThreadIds[i]
+        })
+        let changedThread = action.threads.filter((thrd) => {
+          return thrd.id === changedThreadIds[i]
+        })[0];
+        newThreadList = newThreadList.update(changedIndex, item => fromJS(changedThread))
+      }
+
+      return state.withMutations((ctx) => {
+        ctx.setIn([action.labelId, 'latestUnreadThreads'], action.threads)
+        ctx.setIn([action.labelId, 'threads'], newThreadList)
+      })
+    }
     case GET_MAILBOX_LABEL_INFO_START:
       return state.setIn([action.labelId, 'isFetching'], true)
     case GET_MAILBOX_LABEL_INFO_FAILURE:
       return state.setIn([action.labelId, 'isFetching'], false)
-    case GET_MAILBOX_LABEL_INFO_SUCCESS:
+    case GET_MAILBOX_LABEL_INFO_SUCCESS: {
+      if (!action.payload) {
+        return state.setIn([action.labelId, 'isFetching'], false)
+      }
       return state.withMutations((ctx) => {
         ctx.setIn([action.labelId, 'id'], action.payload.id)
           .setIn([action.labelId, 'name'], action.payload.name)
@@ -87,7 +121,7 @@ export default function mailbox(state = initialState, action) {
           .setIn([action.labelId, 'threadsUnread'], action.payload.threadsUnread)
           .setIn([action.labelId, 'isFetching'], false)
       });
-      return state;
+    }
     default:
       return state;
   }

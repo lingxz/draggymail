@@ -107,19 +107,47 @@ class Cards extends React.Component {
     const { connectDropTarget, x, cards, labelId, isOver, canDrop } = this.props;
     const { placeholderIndex } = this.state;
 
-    let isPlaceHold = false;
-    let cardList = [];
-    cards.forEach((item, i) => {
-      if (isOver && canDrop) {
-        isPlaceHold = false;
-        if (i === 0 && placeholderIndex === -1) {
-          cardList.push(<div key="placeholder" className={s.placeholder} />);
-        } else if (placeholderIndex > i) {
-          isPlaceHold = true;
-        }
-      }
-      if (item !== undefined) {
-        cardList.push(
+    // let isPlaceHold = false;
+    // let cardList = [];
+    // cards.forEach((item, i) => {
+    //   if (isOver && canDrop) {
+    //     isPlaceHold = false;
+    //     if (i === 0 && placeholderIndex === -1) {
+    //       cardList.push(<div key="placeholder" className={s.placeholder} />);
+    //     } else if (placeholderIndex > i) {
+    //       isPlaceHold = true;
+    //     }
+    //   }
+    //   if (item !== undefined) {
+    //     cardList.push(
+    //       <Card
+    //         labelId={labelId}
+    //         x={x}
+    //         y={i}
+    //         item={item}
+    //         key={item.id}
+    //         stopScrolling={this.props.stopScrolling}
+    //       />
+    //     );
+    //   }
+    //   if (isOver && canDrop && placeholderIndex === i) {
+    //     cardList.push(<div key="placeholder" className={s.placeholder} />);
+    //   }
+    // });
+
+    // // if placeholder index is greater than array.length, display placeholder as last
+    // if (isPlaceHold) {
+    //   cardList.push(<div key="placeholder" className={s.placeholder} />);
+    // }
+
+    // // if there is no items in cards currently, display a placeholder anyway
+    // if (isOver && canDrop && cards.length === 0) {
+    //   cardList.push(<div key="placeholder" className={s.placeholder} />);
+    // }
+
+    return connectDropTarget(
+      <div className={s.root}>
+        {cards.map((item, i) =>
           <Card
             labelId={labelId}
             x={x}
@@ -128,26 +156,7 @@ class Cards extends React.Component {
             key={item.id}
             stopScrolling={this.props.stopScrolling}
           />
-        );
-      }
-      if (isOver && canDrop && placeholderIndex === i) {
-        cardList.push(<div key="placeholder" className={s.placeholder} />);
-      }
-    });
-
-    // if placeholder index is greater than array.length, display placeholder as last
-    if (isPlaceHold) {
-      cardList.push(<div key="placeholder" className={s.placeholder} />);
-    }
-
-    // if there is no items in cards currently, display a placeholder anyway
-    if (isOver && canDrop && cards.length === 0) {
-      cardList.push(<div key="placeholder" className={s.placeholder} />);
-    }
-
-    return connectDropTarget(
-      <div className={s.root}>
-        {cardList}
+        )}
       </div>
     );
   }

@@ -7,7 +7,7 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import s from './Board.css';
 import CardsContainer from '../CardsContainer';
-import * as ListsActions from '../../actions/lists';
+import * as MailBoxActions from '../../actions/mailbox';
 import CustomDragLayer from './CustomDragLayer';
 
 function mapStateToProps(state) {
@@ -20,7 +20,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(ListsActions, dispatch);
+  return bindActionCreators(MailBoxActions, dispatch);
 }
 
 class Board extends React.Component {
@@ -36,11 +36,25 @@ class Board extends React.Component {
     this.moveCard = this.moveCard.bind(this);
     this.moveList = this.moveList.bind(this);
     this.findList = this.findList.bind(this);
+    this.tick = this.tick.bind(this);
+    this.syncMailBoxLabel = this.syncMailBoxLabel.bind(this);
     this.scrollRight = this.scrollRight.bind(this);
     this.scrollLeft = this.scrollLeft.bind(this);
     this.stopScrolling = this.stopScrolling.bind(this);
     this.startScrolling = this.startScrolling.bind(this);
     this.state = { isScrolling: false };
+  }
+
+  tick() {
+    this.syncMailBoxLabel(this.props.user, this.props.mailbox['INBOX'])
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(this.tick, 10*1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
   }
 
   startScrolling(direction) {
@@ -74,6 +88,10 @@ class Board extends React.Component {
 
   stopScrolling() {
     this.setState({ isScrolling: false }, clearInterval(this.scrollInterval));
+  }
+
+  syncMailBoxLabel(user, label) {
+    this.props.syncMailBoxLabel(user, label);
   }
 
   moveCard(lastX, lastY, nextX, nextY) {

@@ -6,7 +6,7 @@ import {
   MOVE_CARD,
   MOVE_LIST,
   TOGGLE_DRAGGING
-} from '../actions/lists';
+} from '../constants';
 
 /* eslint-disable new-cap */
 // const InitialState = Record({
