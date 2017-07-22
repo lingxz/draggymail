@@ -12,7 +12,7 @@ export default function configureStore(initialState, helpersConfig) {
   let enhancer;
 
   if (__DEV__) {
-    middleware.push(createLogger());
+    // middleware.push(createLogger());
 
     // https://github.com/zalmoxisus/redux-devtools-extension#redux-devtools-extension
     let devToolsExtension = f => f;

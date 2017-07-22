@@ -11,9 +11,7 @@ import path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import expressJwt, { UnauthorizedError as Jwt401Error } from 'express-jwt';
 import expressGraphQL from 'express-graphql';
-import jwt from 'jsonwebtoken';
 import nodeFetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
@@ -31,7 +29,6 @@ import models from './data/models';
 import schema from './data/schema';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
-// import { setRuntimeVariable } from './actions/runtime';
 import { login } from './actions/user';
 import config from './config';
 
@@ -52,26 +49,9 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-//
-// Authentication
-// -----------------------------------------------------------------------------
-// app.use(expressJwt({
-//   secret: config.auth.jwt.secret,
-//   credentialsRequired: false,
-//   getToken: req => req.cookies.id_token,
-// }));
-// Error handler for express-jwt
-// app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
-//   if (err instanceof Jwt401Error) {
-//     console.error('[express-jwt-error]', req.cookies.id_token);
-//     // `clearCookie`, otherwise user can't use web-app until cookie expires
-//     res.clearCookie('id_token');
-//   }
-//   next(err);
-// });
 
 app.use(session({
-  secret: 'secret!!',
+  secret: config.auth.session.secret,
   resave: false,
   saveUnitialized: false,
   cookie: {
@@ -102,7 +82,13 @@ app.get('/login/google/return',
       id: req.user.id,
       email: req.user.email,
     };
-    res.redirect('/kanban');
+    // configure global authentication
+    // const auth = new google.auth.OAuth2;
+    // auth.credentials = {
+    //   access_token: user.accessToken,
+    // }
+    // google.options({ auth: auth });
+    res.redirect('/');
   }
 )
 
@@ -143,11 +129,7 @@ app.get('*', async (req, res, next) => {
       fetch,
       // I should not use `history` on server.. but how I do redirection? follow universal-router
     });
-    console.log("user!!!==========")
-    console.log(req.isAuthenticated())
-    console.log(req.user);
-    // console.log(req.session.passport.user);
-    console.log(req.session);
+
     if (req.user) {
       store.dispatch(login(req.user))
     }
@@ -251,5 +233,4 @@ if (module.hot) {
   app.hot = module.hot;
   module.hot.accept('./router');
 }
-
 export default app;

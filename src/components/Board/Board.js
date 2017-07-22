@@ -11,8 +11,11 @@ import * as ListsActions from '../../actions/lists';
 import CustomDragLayer from './CustomDragLayer';
 
 function mapStateToProps(state) {
+  const mailbox = state.toJS().mailbox;
   return {
-    lists: state.toJS().lists.lists,
+    user: state.toJS().user,
+    lists: Object.keys(mailbox).map(key => mailbox[key]),
+    // lists: state.toJS().lists.lists,
   };
 }
 
@@ -23,8 +26,9 @@ function mapDispatchToProps(dispatch) {
 class Board extends React.Component {
 
   static propTypes = {
-    getLists: PropTypes.func.isRequired,
+    getEmails: PropTypes.func.isRequired,
     lists: PropTypes.array.isRequired,
+    user: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -91,9 +95,9 @@ class Board extends React.Component {
     };
   }
 
-  componentWillMount() {
-    this.props.getLists(3);
-  }
+  // componentWillMount() {
+  //   this.props.getEmails(this.props.user);
+  // }
 
   render() {
     const { lists } = this.props;

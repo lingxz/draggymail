@@ -14,13 +14,12 @@
  */
 
 import passport from 'passport';
-import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 import { User, UserLogin, UserClaim, UserProfile } from './data/models';
 import config from './config';
 
 /**
- * Sign in with Facebook.
+ * Sign in with Google
  */
 
 passport.use(new GoogleStrategy({

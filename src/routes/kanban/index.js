@@ -1,15 +1,24 @@
 import React from 'react';
 import Layout from '../../components/KanbanLayout';
 import Board from '../../components/Board';
-import * as ListsActions from '../../actions/lists';
+import * as MailBoxActions from '../../actions/mailbox';
 
-function action({ store }) {
-  if (!store.getState().toJS().user) {
+async function action({ store, fetch }) {
+  const user = store.getState().toJS().user
+  if (!user) {
     return { redirect: '/login' }
   }
 
+  const labels = ['INBOX', 'Label_203'];
+  // await store.dispatch(MailBoxActions.getMailBoxLabelInfo(user, labelId));
+  // const label = store.getState().toJS().mailbox[labelId];
+  // console.log("label!!!!!", label);
+  // await store.dispatch(MailBoxActions.fullSyncMailBoxLabelAction(user, label));
+
+  await store.dispatch(MailBoxActions.fullSyncAllLabels(user, labels))
   return {
     chunks: ['kanban'],
+    title: 'Emails',
     component: <Layout><Board /></Layout>,
   };
 }

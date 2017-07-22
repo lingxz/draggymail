@@ -1,12 +1,14 @@
 .root {
-	width: 90%;
-	margin: 0 auto 10px;
+	/*width: 90%;*/
+	/*margin: 0 auto 10px;*/
 	background: #fff;
 	min-height: 100px;
-	border-radius: 5px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.3);
+  border-bottom: 1px solid;
+  border-color: #e3e3e3;
+/*	border-radius: 5px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.3);*/
 	transition: 0.15s;
-	cursor: pointer;
+	/*cursor: pointer;*/
 }
 
 .root:hover {
@@ -15,7 +17,8 @@
 
 .name {
 	padding: 5px 10px;
-	border-bottom: 1px solid #dbdbdb;
+  padding-bottom: 0px;
+	/*border-bottom: 1px solid #dbdbdb;*/
 	white-space: normal;
 	word-break: break-all;
 	word-wrap: break-world;

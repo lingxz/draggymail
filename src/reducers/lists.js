@@ -28,7 +28,7 @@ export default function lists(state = initialState, action) {
             .set('lists', fromJS(action.lists));
       });
     case MOVE_CARD: {
-      const newLists = [...state.lists.toJS()];
+      const newLists = [...state.toJS().lists];
       const { lastX, lastY, nextX, nextY } = action;
       if (lastX === nextX) {
         newLists[lastX].cards.splice(nextY, 0, newLists[lastX].cards.splice(lastY, 1)[0]);
@@ -43,7 +43,7 @@ export default function lists(state = initialState, action) {
       });
     }
     case MOVE_LIST: {
-      const newLists = [...state.lists.toJS()];
+      const newLists = [...state.toJS().lists];
       const { lastX, nextX } = action;
       const t = newLists.splice(lastX, 1)[0];
 

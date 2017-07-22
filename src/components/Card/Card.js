@@ -12,14 +12,11 @@ class Card extends React.Component {
 		const { style, item } = this.props;
 		return (
 	    <div style={style} className={s.root} id={style ? item.id : null}>
-	      <div className={s.name}>{item.title}</div>
+	      <div className={s.name}>{item.from}</div>
 	      <div className={s.container}>
-	        <div className={s.avatar}>
-	          <img src={`https://randomuser.me/api/portraits/med/men/${item.id}.jpg`} alt="" />
-	        </div>
 	        <div className={s.content}>
-	          <div className={s.author}>{`${item.firstName} ${item.lastName}`}</div>
-	          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Libero, banditos.</p>
+	          <div className={s.author}>{item.subject}</div>
+	          <p>{item.snippet}</p>
 	        </div>
 	      </div>
 	    </div>

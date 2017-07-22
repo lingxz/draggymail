@@ -193,7 +193,6 @@ textarea {
 }
 
 .root {
-	padding: 50px 10px;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
