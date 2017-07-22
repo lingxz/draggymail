@@ -10,10 +10,6 @@ async function action({ store, fetch }) {
   }
 
   const labels = ['INBOX', 'Label_203'];
-  // await store.dispatch(MailBoxActions.getMailBoxLabelInfo(user, labelId));
-  // const label = store.getState().toJS().mailbox[labelId];
-  // console.log("label!!!!!", label);
-  // await store.dispatch(MailBoxActions.fullSyncMailBoxLabelAction(user, label));
 
   await store.dispatch(MailBoxActions.fullSyncAllLabels(user, labels))
   return {
