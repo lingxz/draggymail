@@ -18,7 +18,7 @@ class Card extends React.Component {
 	      <div className={s.container}>
 	        <div className={s.content}>
 	          <div className={s.author}>{item.subject}</div>
-	          <p>{item.snippet}</p>
+            <p dangerouslySetInnerHTML={{__html: item.snippet}}></p>
 	        </div>
 	      </div>
 	    </div>
