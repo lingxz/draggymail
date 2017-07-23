@@ -47,7 +47,10 @@ class Board extends React.Component {
   }
 
   tick() {
-    this.syncMailBoxLabel(this.props.user, this.props.mailbox['INBOX'])
+    const { user, labelsToShow, mailbox } = this.props;
+    for (var i = 0; i < labelsToShow.length; i++) {
+      this.syncMailBoxLabel(user, mailbox[labelsToShow[i]])
+    }
   }
 
   componentDidMount() {
