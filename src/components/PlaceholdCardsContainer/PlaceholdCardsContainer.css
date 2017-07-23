@@ -1,0 +1,36 @@
+.root {
+  width: 400px;
+  display: inline-block;
+  height: 100%;
+  overflow: hidden;
+  min-height: 100px;
+  background-color: #e2e4e6;
+  opacity: 0.2;
+  border: 1px solid;
+  border-color: #d3d3d3;
+  padding-bottom: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  vertical-align: top;
+}
+
+
+.button {
+  font-size: 6em;
+  font-weight: 100;
+  vertical-align: middle;
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+  border: none;
+  background: inherit;
+  cursor: pointer;
+}
+
+.button:focus {
+  border: none;
+}
+
+.hidden {
+  display: none;
+}
