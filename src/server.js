@@ -17,6 +17,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
 import session from 'express-session'
+import fetch from 'isomorphic-fetch';
+import google from 'googleapis';
 
 import App from './components/App';
 import Html from './components/Html';
@@ -64,12 +66,34 @@ app.use(passport.session());
 if (__DEV__) {
   app.enable('trust proxy');
 }
+
+app.post('/api/google/refreshtoken', (req, res) => {
+  const oauth = new google.auth.OAuth2(
+      config.auth.google.id,
+      config.auth.google.secret,
+      config.auth.returnURL,
+    )
+  oauth.setCredentials({
+    access_token: req.body.accessToken,
+    refresh_token: req.body.refreshToken,
+  })
+  oauth.refreshAccessToken((err, tokens) => {
+    req.user.accessToken = tokens.access_token;
+    tokens.expiryTime = tokens.expiry_date;
+    req.user.expiryTime = tokens.expiry_date;
+    res.send(tokens);
+  })
+})
+
 app.get('/login/google',
-  passport.authenticate('google', { scope: [
+  passport.authenticate('google', {
+    scope: [
     'https://www.googleapis.com/auth/plus.login',
     'https://www.googleapis.com/auth/plus.profile.emails.read',
     'https://www.googleapis.com/auth/gmail.readonly',
-  ], session: true })
+    ],
+    accessType: 'offline',
+    session: true })
 );
 
 app.get('/login/google/return',
@@ -78,16 +102,6 @@ app.get('/login/google/return',
     session: true,
   }),
   (req, res) => {
-    const user = {
-      id: req.user.id,
-      email: req.user.email,
-    };
-    // configure global authentication
-    // const auth = new google.auth.OAuth2;
-    // auth.credentials = {
-    //   access_token: user.accessToken,
-    // }
-    // google.options({ auth: auth });
     res.redirect('/');
   }
 )

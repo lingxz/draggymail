@@ -27,29 +27,82 @@ passport.use(new GoogleStrategy({
   clientSecret: config.auth.google.secret,
   callbackURL: config.auth.google.returnURL,
   passReqToCallback: true,
-}, (req, accessToken, refreshToken, profile, done) => {
+}, (req, accessToken, refreshToken, params, profile, done) => {
   /* eslint-disable no-underscore-dangle */
+  // TODO: store expiry time of access token
   const loginName = 'google';
   const claimType = 'urn:google:access_token';
+  // expiry time in milliseconds from 1970. expires_in param is given in seconds
+  const expiryTime = (new Date()).getTime() + params.expires_in * 1000;
   const fooBar = async () => {
     if (req.user) {
+      // is logged in
       const userLogin = await UserLogin.findOne({
         attributes: ['name', 'key'],
         where: { name: loginName, key: profile.id },
       });
-
       if (userLogin) {
-        // Sign in with that account or delete it, then link it with your current account.
-        done();
+        done(null, req.user);
       } else {
-        const user = await User.create({
-          id: req.user.id,
+        // there is something wrong, destroy user session and logout
+        req.user = null;
+        req.logOut();
+        req.session.destroy();
+        done();
+      }
+    } else {
+      const users = await User.findAll({
+        attributes: ['id', 'email', 'refreshToken'],
+        where: { '$logins.name$': loginName, '$logins.key$': profile.id },
+        include: [
+          {
+            attributes: ['name', 'key'],
+            model: UserLogin,
+            as: 'logins',
+            required: true,
+          },
+        ],
+      });
+      if (users.length) {
+        // logged in before
+        // TODO: check if a new refresh token is provided, if it is, replace the one in db
+        // if new refresh token is provided, it means he previously revoked access and granted again
+        console.log("should still be here");
+
+        let rfToken = refreshToken;
+        if (refreshToken) {
+          // if refresh token is provided, it means he previously revoked access and granted again
+          // replace the one in the db and save it.
+          users[0].refreshToken = refreshToken;
+          await users[0].save();
+        } else {
+          // if not, retrieve from the db
+          rfToken = users[0].refreshToken;
+        }
+        console.log(rfToken);
+        done(null, {
+          id: users[0].id,
+          email: users[0].email,
+          accessToken: accessToken,
+          refreshToken: rfToken,
+          expiryTime: expiryTime,
+        });
+      } else {
+        let user = await User.findOne({ where: { email: profile._json.email } });
+        // should not find any user here
+        console.log("there should not be any user");
+        console.log(user);
+        console.log(refreshToken);
+        // new login, create new user, store refresh token
+        user = await User.create({
           email: profile.email,
+          emailConfirmed: true,
+          refreshToken: refreshToken,
           logins: [
             { name: loginName, key: profile.id },
           ],
           claims: [
-            { type: claimType, value: profile.id },
+            { type: claimType, value: accessToken },
           ],
           profile: {
             displayName: profile.displayName,
@@ -67,65 +120,12 @@ passport.use(new GoogleStrategy({
           id: user.id,
           email: user.email,
           accessToken: accessToken,
+          refreshToken: refreshToken,
+          expiryTime: expiryTime,
         });
-      }
-    } else {
-      const users = await User.findAll({
-        attributes: ['id', 'email'],
-        where: { '$logins.name$': loginName, '$logins.key$': profile.id },
-        include: [
-          {
-            attributes: ['name', 'key'],
-            model: UserLogin,
-            as: 'logins',
-            required: true,
-          },
-        ],
-      });
-      if (users.length) {
-        done(null, {
-          id: users[0].id,
-          email: users[0].email,
-          accessToken: accessToken,
-        });
-      } else {
-        let user = await User.findOne({ where: { email: profile._json.email } });
-        if (user) {
-          // There is already an account using this email address. Sign in to
-          // that account and link it with Facebook manually from Account Settings.
-          done(null);
-        } else {
-          user = await User.create({
-            email: profile.email,
-            emailVerified: true,
-            logins: [
-              { name: loginName, key: profile.id },
-            ],
-            claims: [
-              { type: claimType, value: accessToken },
-            ],
-            profile: {
-              displayName: profile.displayName,
-              gender: profile._json.gender,
-              picture: profile._json.image.url,
-            },
-          }, {
-            include: [
-              { model: UserLogin, as: 'logins' },
-              { model: UserClaim, as: 'claims' },
-              { model: UserProfile, as: 'profile' },
-            ],
-          });
-          done(null, {
-            id: user.id,
-            email: user.email,
-            accessToken: accessToken,
-          });
-        }
       }
     }
   };
-
   fooBar().catch(done);
 }))
 

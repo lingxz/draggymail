@@ -13,7 +13,11 @@ import {
   GET_LISTS_START,
   MOVE_CARD,
   MOVE_LIST,
-  TOGGLE_DRAGGING
+  TOGGLE_DRAGGING,
+  GET_ALL_MAILBOX_LABELS_START,
+  GET_ALL_MAILBOX_LABELS_SUCCESS,
+  GET_ALL_MAILBOX_LABELS_FAILURE,
+  UPDATE_USER_CREDENTIALS,
 } from '../constants';
 
 export function moveList(lastX, nextX) {
@@ -127,6 +131,44 @@ function processThreads(threads) {
   return inbox;
 }
 
+export function refreshAuth(user) {
+  return GmailActions.refreshToken(user)
+    .then(data => {
+      const newUser = {
+        id: user.id,
+        email: user.email,
+        accessToken: data.access_token,
+        refreshToken: user.refreshToken,
+        expiryTime: data.expiryTime,
+      }
+      return newUser;
+    })
+}
+
+export function authNeedsRefresh(user) {
+  // if expiry is less than one minute away, refresh token
+  const currentTime = (new Date()).getTime();
+  const timeToExpiry = user.expiryTime - currentTime;
+  if (timeToExpiry < 60 * 1000) {
+    return true
+  } else {
+    return false
+  }
+}
+
+export function fetchAllLabelsAction(user) {
+  return async (dispatch) => {
+    if (authNeedsRefresh(user)) {
+      user = await refreshAuth(user);
+      dispatch({ type: UPDATE_USER_CREDENTIALS, user })
+    }
+    dispatch({ type: GET_ALL_MAILBOX_LABELS_START })
+    return GmailActions.fetchAllLabels(user)
+      .then(data => dispatch({ type: GET_ALL_MAILBOX_LABELS_SUCCESS, labels: data.labels }))
+      .catch(err => dispatch({ type: GET_ALL_MAILBOX_LABELS_FAILURE, err }))
+  }
+}
+
 export function fullSyncMailBoxLabel(user, label) {
   const params = {
     labelIds: label.id
@@ -188,7 +230,11 @@ export function fullSyncMultipleLabels(user, labelIds) {
 }
 
 export function fullSyncMultipleLabelsAction(user, labelIds) {
-  return dispatch => {
+  return async (dispatch) => {
+    if (authNeedsRefresh(user)) {
+      user = await refreshAuth(user);
+      dispatch({ type: UPDATE_USER_CREDENTIALS, user })
+    }
     for (var idx = 0; idx < labelIds.length; idx++) {
       dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId: labelIds[idx] })
     }
@@ -235,7 +281,11 @@ export function getMailBoxLabelInfo(user, labelId) {
 }
 
 export function syncMailBoxLabel(user, label) {
-  return dispatch => {
+  return async (dispatch) => {
+    if (authNeedsRefresh(user)) {
+      user = await refreshAuth(user);
+      dispatch({ type: UPDATE_USER_CREDENTIALS, user })
+    }
     dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id })
     const labelId = label.id;
     const messagesTotal = label.messagesTotal;
@@ -245,8 +295,6 @@ export function syncMailBoxLabel(user, label) {
     return GmailActions.fetchLabelInfo(user, labelId)
       .then(data => {
         // update decide if we changed
-        console.log("data===== mailbox label info success")
-        console.log(data);
         dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: label.id, payload: data })
         return messagesTotal !== data.messagesTotal || messagesUnread !== data.messagesUnread
       })

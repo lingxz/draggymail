@@ -7,9 +7,10 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import s from './Board.css';
 import CardsContainer from '../CardsContainer';
+import PlaceholdCardsContainer from '../PlaceholdCardsContainer';
 import * as MailBoxActions from '../../actions/mailbox';
 import CustomDragLayer from './CustomDragLayer';
-import { GMAIL_UNREAD_SYNC_MS } from '../../constants';
+import { GMAIL_UNREAD_SYNC_MS, FETCH_ALL_MAILBOX_LABELS } from '../../constants';
 
 function mapStateToProps(state) {
   const jsState = state.toJS();
@@ -17,6 +18,7 @@ function mapStateToProps(state) {
     user: jsState.user,
     labelsToShow: jsState.labels.labelsToShow,
     mailbox: jsState.mailbox,
+    allLabels: jsState.labels.allLabels,
   };
 }
 
@@ -30,6 +32,7 @@ class Board extends React.Component {
     labelsToShow: PropTypes.array.isRequired,
     mailbox: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
+    allLabels: PropTypes.array,
   }
 
   constructor(props) {
@@ -39,6 +42,7 @@ class Board extends React.Component {
     this.findList = this.findList.bind(this);
     this.tick = this.tick.bind(this);
     this.syncMailBoxLabel = this.syncMailBoxLabel.bind(this);
+    this.fetchAllLabelsAction = this.fetchAllLabelsAction.bind(this);
     this.scrollRight = this.scrollRight.bind(this);
     this.scrollLeft = this.scrollLeft.bind(this);
     this.stopScrolling = this.stopScrolling.bind(this);
@@ -53,12 +57,19 @@ class Board extends React.Component {
     }
   }
 
+  fetchAllLabelsTick() {
+    const { user } = this.props;
+    this.fetchAllLabelsAction(user);
+  }
+
   componentDidMount() {
     this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
+    this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
   }
 
   componentWillUnmount() {
     clearInterval(this.interval)
+    clearInterval(this.fetchAllLabelsInterval)
   }
 
   startScrolling(direction) {
@@ -98,6 +109,10 @@ class Board extends React.Component {
     this.props.syncMailBoxLabel(user, label);
   }
 
+  fetchAllLabelsAction(user) {
+    this.props.fetchAllLabelsAction(user);
+  }
+
   moveCard(lastX, lastY, nextX, nextY) {
     this.props.moveCard(lastX, lastY, nextX, nextY);
   }
@@ -117,7 +132,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const { mailbox, labelsToShow } = this.props;
+    const { mailbox, labelsToShow, allLabels } = this.props;
     return (
       <div className={s.root}>
         <CustomDragLayer snapToGrid={false} />
@@ -134,6 +149,7 @@ class Board extends React.Component {
             x={i}
           />
         )}
+        <PlaceholdCardsContainer allLabels={allLabels} />
       </div>
     )
   }

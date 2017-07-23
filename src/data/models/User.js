@@ -28,6 +28,10 @@ const User = Model.define('User', {
     defaultValue: false,
   },
 
+  refreshToken: {
+    type: DataType.STRING,
+  }
+
 }, {
 
   indexes: [

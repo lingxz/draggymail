@@ -1,5 +1,17 @@
-import fetch from 'isomorphic-fetch';
-
+export function refreshToken(user) {
+  return fetch('/api/google/refreshtoken', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      refreshToken: user.refreshToken,
+      accessToken: user.accessToken,
+    })
+  })
+  .then(response => response.json())
+}
 
 /* **************************************************************************/
 // Label
@@ -9,6 +21,14 @@ import fetch from 'isomorphic-fetch';
 export function fetchLabelInfo(user, labelId) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/labels/";
   return fetch(url + labelId, {
+    headers: { "Authorization": "Bearer " + user.accessToken },
+  })
+    .then(response => response.json())
+}
+
+export function fetchAllLabels(user) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/labels";
+  return fetch(url, {
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
     .then(response => response.json())

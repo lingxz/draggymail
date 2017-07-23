@@ -5,18 +5,16 @@ import {
   GET_LISTS_START,
   MOVE_CARD,
   MOVE_LIST,
-  TOGGLE_DRAGGING
+  TOGGLE_DRAGGING,
+  GET_ALL_MAILBOX_LABELS_START,
+  GET_ALL_MAILBOX_LABELS_SUCCESS,
+  GET_ALL_MAILBOX_LABELS_FAILURE,
 } from '../constants';
 
-/* eslint-disable new-cap */
-// const InitialState = Record({
-//   isFetching: false,
-//   lists: List(),
-//   isDragging: false
-// });
 
 const initialState = fromJS({
   allLabels: [],
+  isFetching: false,
   isDragging: false,
   labelsToShow: ['INBOX', 'Label_203'],
 })
@@ -24,6 +22,12 @@ const initialState = fromJS({
 // const initialState = new InitialState;
 export default function labels(state = initialState, action) {
   switch (action.type) {
+    case GET_ALL_MAILBOX_LABELS_START:
+      return state.set('isFetching', true)
+    case GET_ALL_MAILBOX_LABELS_SUCCESS:
+      return state.set('allLabels', fromJS(action.labels))
+    case GET_ALL_MAILBOX_LABELS_FAILURE:
+      return state.set('isFetching', false)
     case MOVE_LIST: {
       const newLabelsToShow = [...state.toJS().labelsToShow];
       const { lastX, nextX } = action;
