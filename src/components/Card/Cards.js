@@ -89,6 +89,7 @@ class Cards extends React.Component {
     x: PropTypes.number.isRequired,
     isOver: PropTypes.bool,
     item: PropTypes.object,
+    latestUnreadThreads: PropTypes.array,
     canDrop: PropTypes.bool,
     startScrolling: PropTypes.func,
     stopScrolling: PropTypes.func,
@@ -104,47 +105,17 @@ class Cards extends React.Component {
   }
 
   render() {
-    const { connectDropTarget, x, cards, labelId, isOver, canDrop } = this.props;
-    const { placeholderIndex } = this.state;
-
-    // let isPlaceHold = false;
-    // let cardList = [];
-    // cards.forEach((item, i) => {
-    //   if (isOver && canDrop) {
-    //     isPlaceHold = false;
-    //     if (i === 0 && placeholderIndex === -1) {
-    //       cardList.push(<div key="placeholder" className={s.placeholder} />);
-    //     } else if (placeholderIndex > i) {
-    //       isPlaceHold = true;
-    //     }
-    //   }
-    //   if (item !== undefined) {
-    //     cardList.push(
-    //       <Card
-    //         labelId={labelId}
-    //         x={x}
-    //         y={i}
-    //         item={item}
-    //         key={item.id}
-    //         stopScrolling={this.props.stopScrolling}
-    //       />
-    //     );
-    //   }
-    //   if (isOver && canDrop && placeholderIndex === i) {
-    //     cardList.push(<div key="placeholder" className={s.placeholder} />);
-    //   }
-    // });
-
-    // // if placeholder index is greater than array.length, display placeholder as last
-    // if (isPlaceHold) {
-    //   cardList.push(<div key="placeholder" className={s.placeholder} />);
-    // }
-
-    // // if there is no items in cards currently, display a placeholder anyway
-    // if (isOver && canDrop && cards.length === 0) {
-    //   cardList.push(<div key="placeholder" className={s.placeholder} />);
-    // }
-
+    const { connectDropTarget, x, cards, latestUnreadThreads, labelId, isOver, canDrop } = this.props;
+    // const { placeholderIndex } = this.state;
+    const latestUnreadThreadIds = latestUnreadThreads.map(item => item.id);
+    const unreadMap = {}
+    for (var idx = 0; idx < cards.length; idx++) {
+      if (latestUnreadThreadIds.indexOf(cards[idx].id) > -1) {
+        unreadMap[cards[idx].id] = true;
+      } else {
+        unreadMap[cards[idx].id] = false;
+      }
+    }
     return connectDropTarget(
       <div className={s.root}>
         {cards.map((item, i) =>
@@ -152,6 +123,8 @@ class Cards extends React.Component {
             labelId={labelId}
             x={x}
             y={i}
+            // unread={(latestUnreadThreads.indexOf(item.id) > -1) ? true: false}
+            unread={unreadMap[item.id]}
             item={item}
             key={item.id}
             stopScrolling={this.props.stopScrolling}

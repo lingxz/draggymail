@@ -44,6 +44,7 @@ class DraggableCard extends React.Component {
   static propTypes = {
     labelId: PropTypes.string.isRequired,
     item: PropTypes.object,
+    unread: PropTypes.bool.isRequired,
     connectDragSource: PropTypes.func.isRequired,
     isDragging: PropTypes.bool.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
@@ -56,11 +57,11 @@ class DraggableCard extends React.Component {
   }
 
 	render() {
-		const { isDragging, connectDragSource, item } = this.props;
+		const { isDragging, connectDragSource, item, unread } = this.props;
 
 		return connectDragSource(
   		<div>
-        <Card style={getStyles(isDragging)} item={item} />
+        <Card style={getStyles(isDragging)} item={item} unread={unread}/>
       </div>
 		)
 	}

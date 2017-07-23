@@ -6,15 +6,11 @@ import s from './Card.css';
 class Card extends React.Component {
 	static propTypes = {
 		item: PropTypes.object.isRequired,
+    unread: PropTypes.bool.isRequired,
 		style: PropTypes.object
 	}
 	render() {
-		const { style, item } = this.props;
-
-    let unread = false;
-    if (item.labelIds.indexOf('UNREAD') > -1) {
-      unread = true;
-    }
+		const { style, item, unread } = this.props;
 
 		return (
 	    <div style={style} className={unread ? s.unread: s.root} id={style ? item.id : null}>

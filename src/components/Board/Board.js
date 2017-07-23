@@ -9,6 +9,7 @@ import s from './Board.css';
 import CardsContainer from '../CardsContainer';
 import * as MailBoxActions from '../../actions/mailbox';
 import CustomDragLayer from './CustomDragLayer';
+import { GMAIL_UNREAD_SYNC_MS } from '../../constants';
 
 function mapStateToProps(state) {
   const jsState = state.toJS();
@@ -50,7 +51,7 @@ class Board extends React.Component {
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.tick, 10*1000);
+    this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
   }
 
   componentWillUnmount() {

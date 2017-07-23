@@ -18,7 +18,21 @@ export function fetchMultipleLabelInfo(user, labelIds) {
   let allFetches = [];
   for (var i = 0; i < labelIds.length; i++) {
     let labelId = labelIds[i];
-    allFetches.push(fetchLabelInfo(user, labelId));
+    let promise = fetchLabelInfo(user, labelId)
+      .then(data => {
+        const queryString = 'labelIds=UNREAD&labelIds=' + labelId
+        return fetchThreadIds(user, '?' + queryString)
+          .then(threadData => {
+            let threads = threadData.threads || [];
+            if (threads.length === 0) {
+              data.latestUnreadThreads = [];
+              return data
+            }
+            data.latestUnreadThreads = threadData.threads;
+            return data;
+          })
+      })
+    allFetches.push(promise);
   }
   return Promise.all(allFetches)
 }

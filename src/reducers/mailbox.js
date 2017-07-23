@@ -75,26 +75,31 @@ export default function mailbox(state = initialState, action) {
           ctx.setIn([action.labelId, 'isFetching'], false)
         })
       }
+
+      if (action.latestUnreadThreads) {
+        return state.withMutations((ctx) =>  {
+          ctx.setIn([action.labelId, 'isFetching'], false)
+          ctx.setIn([action.labelId, 'threads'], fromJS(action.threads))
+          ctx.setIn([action.labelId, 'latestUnreadThreads'], fromJS(action.latestUnreadThreads))
+        })
+      }
       return state.withMutations((ctx) =>  {
         ctx.setIn([action.labelId, 'isFetching'], false)
         ctx.setIn([action.labelId, 'threads'], fromJS(action.threads))
-        ctx.setIn([action.labelId, 'latestUnreadThreads'], fromJS(action.latestUnreadThreads || []))
       })
     }
     case SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE:
       return state.setIn([action.labelId, 'isFetching'], false)
     case SYNC_MAILBOX_LATEST_UNREAD_THREADS: {
-      const changedThreadIds = action.threads.map(item => item.id)
+      // const changedThreadIds = action.threads.map(item => item.id)
       const currentThreadList = state.get(action.labelId).get('threads');
 
       let newThreadList = currentThreadList;
-      for (var i = 0; i < changedThreadIds.length; i++) {
+      for (var i = 0; i < action.threads.length; i++) {
+        let changedThread = action.threads[i];
         let changedIndex = newThreadList.findIndex((item) => {
-          return item.get('id') === changedThreadIds[i]
+          return item.get('id') === changedThread.id;
         })
-        let changedThread = action.threads.filter((thrd) => {
-          return thrd.id === changedThreadIds[i]
-        })[0];
         newThreadList = newThreadList.update(changedIndex, item => fromJS(changedThread))
       }
 
@@ -110,6 +115,19 @@ export default function mailbox(state = initialState, action) {
     case GET_MAILBOX_LABEL_INFO_SUCCESS: {
       if (!action.payload) {
         return state.setIn([action.labelId, 'isFetching'], false)
+      }
+      if (action.payload.latestUnreadThreads) {
+        return state.withMutations((ctx) => {
+          ctx.setIn([action.labelId, 'id'], action.payload.id)
+            .setIn([action.labelId, 'name'], action.payload.name)
+            .setIn([action.labelId, 'type'], action.payload.type)
+            .setIn([action.labelId, 'messagesTotal'], action.payload.messagesTotal)
+            .setIn([action.labelId, 'messagesUnread'], action.payload.messagesUnread)
+            .setIn([action.labelId, 'threadsTotal'], action.payload.threadsTotal)
+            .setIn([action.labelId, 'threadsUnread'], action.payload.threadsUnread)
+            .setIn([action.labelId, 'isFetching'], false)
+            .setIn([action.labelId, 'latestUnreadThreads'], action.payload.latestUnreadThreads)
+        });
       }
       return state.withMutations((ctx) => {
         ctx.setIn([action.labelId, 'id'], action.payload.id)

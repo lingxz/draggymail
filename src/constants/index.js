@@ -32,3 +32,5 @@ export const GET_LISTS = 'GET_LISTS';
 export const MOVE_CARD = 'MOVE_CARD';
 export const MOVE_LIST = 'MOVE_LIST';
 export const TOGGLE_DRAGGING = 'TOGGLE_DRAGGING';
+
+export const GMAIL_UNREAD_SYNC_MS = 10*1000; // every 10 seconds

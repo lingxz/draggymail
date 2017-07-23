@@ -88,6 +88,7 @@ class CardsContainer extends React.Component {
             item={item}
             x={x}
             cards={item.threads}
+            latestUnreadThreads={item.latestUnreadThreads}
             startScrolling={this.props.startScrolling}
             stopScrolling={this.props.stopScrolling}
             isScrolling={this.props.isScrolling}
