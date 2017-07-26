@@ -1,18 +1,21 @@
 import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
+import createSagaMiddleware from 'redux-saga'
 import { Record, fromJS } from "immutable"
 import rootReducer from '../reducers';
 import createHelpers from './createHelpers';
 import createLogger from './logger';
+import rootSaga from '../sagas';
 
 export default function configureStore(initialState, helpersConfig) {
   const helpers = createHelpers(helpersConfig);
-  const middleware = [thunk.withExtraArgument(helpers)];
+  const sagaMiddleware = createSagaMiddleware();
+  // const middleware = [sagaMiddleware, thunk.withExtraArgument(helpers)];
+  const middleware = [sagaMiddleware]
 
   let enhancer;
 
   if (__DEV__) {
-    // middleware.push(createLogger());
+    middleware.push(createLogger());
 
     // https://github.com/zalmoxisus/redux-devtools-extension#redux-devtools-extension
     let devToolsExtension = f => f;
@@ -30,6 +33,7 @@ export default function configureStore(initialState, helpersConfig) {
 
   // See https://github.com/rackt/redux/releases/tag/v3.1.0
   const store = createStore(rootReducer, fromJS(initialState), enhancer);
+  sagaMiddleware.run(rootSaga);
 
   // Hot reload reducers (requires Webpack or Browserify HMR to be enabled)
   if (__DEV__ && module.hot) {

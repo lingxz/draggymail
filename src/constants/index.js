@@ -6,6 +6,20 @@ export const CARD_HEIGHT = 168;  // height of a single card(excluding marginBott
 export const CARD_MARGIN = 32;  // height of a marginBottom+paddingBottom
 export const OFFSET_HEIGHT = 84; // height offset from the top of the page
 
+export const USER_LOGOUT = 'USER_LOGOUT';
+export const USER_LOGIN = 'USER_LOGIN';
+export const USER_LOGIN_FAILURE = 'USER_LOGIN_FAILURE';
+
+export const FULL_SYNC_MAILBOX_REQUEST = 'FULL_SYNC_MAILBOX_REQUEST';
+export const FULL_SYNC_MAILBOX_FAILURE = 'FULL_SYNC_MAILBOX_FAILURE';
+
+export const PARTIAL_SYNC_MAILBOX_REQUEST = 'PARTIAL_SYNC_MAILBOX_REQUEST';
+export const PARTIAL_SYNC_MAILBOX_SUCCESS = 'PARTIAL_SYNC_MAILBOX_SUCCESS';
+export const PARTIAL_SYNC_MAILBOX_FAILURE = 'PARTIAL_SYNC_MAILBOX_FAILURE';
+
+export const UPDATE_HISTORY_ID = 'UPDATE_HISTORY_ID';
+
+
 export const CLEAR_MAILBOX = 'CLEAR_MAILBOX';
 export const SYNC_MAILBOX_PROFILE = 'SYNC_MAILBOX_PROFILE';
 export const SYNC_MAILBOX_PROFILE_SUCCESS = 'SYNC_MAILBOX_PROFILE_SUCCESS';

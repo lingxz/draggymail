@@ -3,18 +3,16 @@ import Layout from '../../components/KanbanLayout';
 import Board from '../../components/Board';
 import * as MailBoxActions from '../../actions/mailbox';
 
-async function action({ store, fetch }) {
+function action({ store, fetch }) {
   const user = store.getState().toJS().user
   if (!user) {
     return { redirect: '/login' }
   }
 
-  const labels = ['INBOX', 'Label_203'];
+  store.dispatch({ type: "FULL_SYNC_MAILBOX_REQUEST" })
 
-  await store.dispatch(MailBoxActions.fullSyncMultipleLabelsAction(user, labels))
-  const label = store.getState().toJS().mailbox['INBOX']
-  await store.dispatch(MailBoxActions.syncMailBoxLabel(user, label));
-  await store.dispatch(MailBoxActions.fetchAllLabelsAction(user));
+  // const labels = ['INBOX', 'Label_203'];
+
   return {
     chunks: ['kanban'],
     title: 'Emails',

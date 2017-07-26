@@ -105,17 +105,8 @@ class Cards extends React.Component {
   }
 
   render() {
-    const { connectDropTarget, x, cards, latestUnreadThreads, labelId, isOver, canDrop } = this.props;
+    const { connectDropTarget, x, cards, labelId, isOver, canDrop } = this.props;
     // const { placeholderIndex } = this.state;
-    const latestUnreadThreadIds = latestUnreadThreads.map(item => item.id);
-    const unreadMap = {}
-    for (var idx = 0; idx < cards.length; idx++) {
-      if (latestUnreadThreadIds.indexOf(cards[idx].id) > -1) {
-        unreadMap[cards[idx].id] = true;
-      } else {
-        unreadMap[cards[idx].id] = false;
-      }
-    }
     return connectDropTarget(
       <div className={s.root}>
         {cards.map((item, i) =>
@@ -123,8 +114,6 @@ class Cards extends React.Component {
             labelId={labelId}
             x={x}
             y={i}
-            // unread={(latestUnreadThreads.indexOf(item.id) > -1) ? true: false}
-            unread={unreadMap[item.id]}
             item={item}
             key={item.id}
             stopScrolling={this.props.stopScrolling}

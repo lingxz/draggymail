@@ -9,6 +9,7 @@ import {
   GET_ALL_MAILBOX_LABELS_START,
   GET_ALL_MAILBOX_LABELS_SUCCESS,
   GET_ALL_MAILBOX_LABELS_FAILURE,
+  UPDATE_HISTORY_ID,
 } from '../constants';
 
 
@@ -28,6 +29,14 @@ export default function labels(state = initialState, action) {
       return state.set('allLabels', fromJS(action.labels))
     case GET_ALL_MAILBOX_LABELS_FAILURE:
       return state.set('isFetching', false)
+    case UPDATE_HISTORY_ID: {
+      const currentHistoryId = state.toJS().latestHistoryId || '';
+      if (action.latestHistoryId > currentHistoryId) {
+        return state.set('latestHistoryId', action.latestHistoryId)
+      } else {
+        return state;
+      }
+    }
     case MOVE_LIST: {
       const newLabelsToShow = [...state.toJS().labelsToShow];
       const { lastX, nextX } = action;

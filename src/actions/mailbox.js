@@ -18,24 +18,19 @@ import {
   GET_ALL_MAILBOX_LABELS_SUCCESS,
   GET_ALL_MAILBOX_LABELS_FAILURE,
   UPDATE_USER_CREDENTIALS,
+  PARTIAL_SYNC_MAILBOX_REQUEST,
 } from '../constants';
 
 export function moveList(lastX, nextX) {
-  return (dispatch) => {
-    dispatch({ type: MOVE_LIST, lastX, nextX });
-  };
+  return { type: MOVE_LIST, lastX, nextX }
 }
 
 export function moveCard(lastLabelId, nextLabelId, lastY) {
-  return (dispatch) => {
-    dispatch({ type: MOVE_CARD, lastLabelId, nextLabelId, lastY });
-  };
+  return { type: MOVE_CARD, lastLabelId, nextLabelId, lastY }
 }
 
 export function toggleDragging(isDragging) {
-  return (dispatch) => {
-    dispatch({ type: TOGGLE_DRAGGING, isDragging });
-  };
+  return { type: TOGGLE_DRAGGING, isDragging }
 }
 
 function getQueryString(params) {
@@ -108,6 +103,13 @@ function processEmails(emails) {
 function formatThread(thread) {
   const emails = processEmails(thread.messages)
   const latestEmail = emails[emails.length - 1]
+  let unread = false;
+  for (var i = 0; i < emails.length; i++) {
+    if (emails[i].labelIds.indexOf('UNREAD') > -1) {
+      unread = true;
+      break;
+    }
+  }
   return {
     id: thread.id,
     historyId: thread.historyId,
@@ -119,6 +121,7 @@ function formatThread(thread) {
     subject: latestEmail.subject,
     labelIds: latestEmail.labelIds,
     emails: emails,
+    unread: unread,
   }
 }
 
@@ -130,6 +133,32 @@ function processThreads(threads) {
   }
   return inbox;
 }
+
+function sortAndProcessMessages(messages, labelIds) {
+  const messagesTrashed = [];
+  const messagesRemovedFromLabels = [];
+  const messagesChanged = []; // changed or added
+  const messagesDeleted = [];
+  for (var i = 0; i < messages.length; i++) {
+    if (messages[i].deleted) {
+      messagesDeleted.push(messages[i])
+    } else {
+      let email = formatEmail(messages[i]);
+      if (email.labelIds.indexOf('TRASH') > -1 ) {
+        // deleted messages
+        messagesTrashed.push(email);
+      } else {
+        if (email.labelIds.some(v => labelIds.indexOf(v) >= 0)) {
+          messagesChanged.push(email)
+        } else {
+          messagesRemovedFromLabels.push(email)
+        }
+      }
+    }
+  }
+  return { messagesTrashed, messagesChanged, messagesRemovedFromLabels, messagesDeleted }
+}
+
 
 export function refreshAuth(user) {
   return GmailActions.refreshToken(user)
@@ -187,17 +216,19 @@ export function fullSyncMailBoxLabel(user, label) {
     .then(threads => processThreads(threads))
 }
 
-export function fullSyncMailBoxLabelAction(user, label) {
-  return dispatch => {
-    dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id })
-    try {
-      return fullSyncMailBoxLabel(user, label)
-        .then(threads => dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: label.id, threads }))
-    }
-    catch(err) {
-      return dispatch({ type: SYNC_MAILBOX_LABEL_FAILURE, labelId: label.id, err })
-    }
+export function fetchMultipleLabelInfo(user, labelIds) {
+  return GmailActions.fetchMultipleLabelInfo(user, labelIds)
+}
+
+
+function getLatestHistoryId(labelsMap) {
+  const historyIds = [];
+  for (var key in labelsMap) {
+    let threads = labelsMap[key];
+    let maxHistoryId = Math.max.apply(Math, threads.map(item => Number(item.historyId)));
+    historyIds.push(maxHistoryId)
   }
+  return Math.max(...historyIds).toString();
 }
 
 export function fullSyncMultipleLabels(user, labelIds) {
@@ -225,7 +256,7 @@ export function fullSyncMultipleLabels(user, labelIds) {
       for (var i = 0; i < data.length; i++) {
         labelsMap[labelIds[i]] = data[i].map(thread => formatThread(thread));
       }
-      return labelsMap;
+      return { latestHistoryId: getLatestHistoryId(labelsMap), labelsMap};
     })
 }
 
@@ -243,7 +274,6 @@ export function fullSyncMultipleLabelsAction(user, labelIds) {
         .then(data => {
           for (var i = 0; i < data.length; i++) {
             let labelInfo = data[i];
-            console.log(data[i]);
             dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: labelInfo.id, payload: labelInfo })
           }
           for (var idx = 0; idx < labelIds.length; idx++) {
@@ -281,92 +311,49 @@ export function getMailBoxLabelInfo(user, labelId) {
 }
 
 export function syncMailBoxLabel(user, label) {
-  return async (dispatch) => {
-    if (authNeedsRefresh(user)) {
-      user = await refreshAuth(user);
-      dispatch({ type: UPDATE_USER_CREDENTIALS, user })
-    }
-    dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id })
-    const labelId = label.id;
-    const messagesTotal = label.messagesTotal;
-    const messagesUnread = label.messagesUnread;
-    // this is a cheap call to see if anything changed in the label
-    dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId: label.id })
-    return GmailActions.fetchLabelInfo(user, labelId)
+  return (dispatch) => {
+    dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id });
+    return GmailActions.fetchHistory(user, label.latestHistoryId)
       .then(data => {
-        // update decide if we changed
-        dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: label.id, payload: data })
-        return messagesTotal !== data.messagesTotal || messagesUnread !== data.messagesUnread
-      })
-      .then(changed => {
-        console.log("changed???");
-        console.log(changed);
-        if (!changed) {
-          return dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE, labelId: label.id });
-        }
-        const queryString = 'labelIds=UNREAD&labelIds=' + label.id;
-        return GmailActions.fetchThreadIds(user, '?' + queryString)
-          .then(data => {
-            const threads = data.threads || [];
-            if (threads.length === 0) {
-              return {
-                threads: threads,
-                changedThreads: [],
-              }
-            }
-            const latestUnreadThreads = label.latestUnreadThreads || [];
-            const currentThreadsIndex = latestUnreadThreads.reduce((map, item) => {
-              map[item.id] = item;
-              return map;
-            }, {});
 
-            // TODO: changed threads need to take into account unread -> read
-            // and deleted emails
-            let changedThreads = threads.reduce((acc, thread) => {
-              if (!currentThreadsIndex[thread.id]) {
-                // thread not in the unread list
-                acc.push(thread)
-              } else if (currentThreadsIndex[thread.id].historyId !== thread.historyId) {
-                // thread was previously in unread list but something changed
-                acc.push(thread)
-              } else if ((currentThreadsIndex[thread.id].messages || []).length === 0) {
-                // there are no emails in previously stored thread
-                acc.push(thread)
-              }
-              return acc;
-            }, [])
-            console.log("changed threads!!!!");
-            console.log(changedThreads);
-            return { threads: threads, changedThreads: changedThreads }
-          })
-          .then(({ threads, changedThreads }) => {
-            // grab the full threads that were changed
-            if (changedThreads.length === 0) {
-              // unread threads didn't change, but something changed inside the threads
-              // ????? idk anymore
-              return { threads: threads, changedThreads: [] }
-            }
-            const changedThreadIds = changedThreads.map(thread => thread.id)
-            return GmailActions.fetchManyThreads(user, changedThreadIds)
-              .then(changedThreads => {
-                return { threads: threads, changedThreads: changedThreads }
-              })
-          })
-          .then(({ threads, changedThreads }) => {
-            // store the grabbed threads
-            if (changedThreads.length === 0) {
-              return dispatch({ type: SYNC_MAILBOX_LATEST_UNREAD_THREADS, labelId: label.id, threads: []})
-            }
-            console.log("latest unread threads!!!");
-            dispatch({ type: SYNC_MAILBOX_LATEST_UNREAD_THREADS, labelId: label.id, threads: processThreads(changedThreads) });
-            return changedThreads;
-          })
-      })
-      .then(response => dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: label.id }))
-      .catch(err => {
-        console.log("error!!!!");
-        console.log(err);
-        dispatch({ type: SYNC_MAILBOX_LABEL_FAILURE, labelId: label.id, err })
       })
   }
 }
+
+export function requestPartialSyncMailBox() {
+  return ({ type: PARTIAL_SYNC_MAILBOX_REQUEST })
+}
+
+export function partialSyncMailBox(user, labels, mailbox) {
+  // TODO need to retrieve according to next page token
+  console.log(labels);
+  return GmailActions.fetchHistory(user, labels.latestHistoryId)
+    .then(data => {
+      if (data.historyId == labels.latestHistoryId) {
+        // nothing changed
+        return { changed: false }
+      }
+      if (!data.history) {
+        // nothing changed but need to update latestHistoryId
+        return { changed: false, latestHistoryId: data.historyId }
+      }
+
+      // stuff changed
+      const history = data.history;
+      const allChangedMessageIds = [];
+      for (var i = 0; i < history.length; i++) {
+        let changedMessageIds = history[i].messages.map(item => item.id);
+        allChangedMessageIds.push.apply(allChangedMessageIds, changedMessageIds)
+      }
+      // remove duplicates in the list of threadIds
+      const allChangedMessageIdsSet = [...new Set(allChangedMessageIds)]
+      // fetch and sort, returns a dictionary
+      return GmailActions.fetchManyMessages(user, allChangedMessageIdsSet)
+        .then(messages => {
+          const labelIds = Object.keys(mailbox);
+          const { messagesTrashed, messagesChanged, messagesRemovedFromLabels, messagesDeleted } = sortAndProcessMessages(messages, labelIds)
+          return { changed: true, latestHistoryId: data.historyId, messagesTrashed, messagesChanged, messagesRemovedFromLabels, messagesDeleted }
+        })
+    })
+}
+

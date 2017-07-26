@@ -76,6 +76,7 @@ class CardsContainer extends React.Component {
 
 	render() {
     const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging } = this.props;
+    const threads = item.threads || [];
 	  return connectDragSource(connectDropTarget(
       <div className={s.root}>
         <div className={s.head}>
@@ -87,7 +88,7 @@ class CardsContainer extends React.Component {
             moveCard={moveCard}
             item={item}
             x={x}
-            cards={item.threads}
+            cards={threads}
             latestUnreadThreads={item.latestUnreadThreads}
             startScrolling={this.props.startScrolling}
             stopScrolling={this.props.stopScrolling}

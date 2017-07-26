@@ -29,7 +29,6 @@ passport.use(new GoogleStrategy({
   passReqToCallback: true,
 }, (req, accessToken, refreshToken, params, profile, done) => {
   /* eslint-disable no-underscore-dangle */
-  // TODO: store expiry time of access token
   const loginName = 'google';
   const claimType = 'urn:google:access_token';
   // expiry time in milliseconds from 1970. expires_in param is given in seconds

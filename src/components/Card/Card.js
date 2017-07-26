@@ -6,14 +6,13 @@ import s from './Card.css';
 class Card extends React.Component {
 	static propTypes = {
 		item: PropTypes.object.isRequired,
-    unread: PropTypes.bool.isRequired,
 		style: PropTypes.object
 	}
 	render() {
-		const { style, item, unread } = this.props;
+		const { style, item } = this.props;
 
 		return (
-	    <div style={style} className={unread ? s.unread: s.root} id={style ? item.id : null}>
+	    <div style={style} className={item.unread ? s.unread: s.root} id={style ? item.id : null}>
 	      <div className={s.name}>{item.from}</div>
 	      <div className={s.container}>
 	        <div className={s.content}>

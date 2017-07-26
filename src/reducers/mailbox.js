@@ -9,6 +9,9 @@ import {
   GET_MAILBOX_LABEL_INFO_START,
   GET_MAILBOX_LABEL_INFO_SUCCESS,
   GET_MAILBOX_LABEL_INFO_FAILURE,
+  PARTIAL_SYNC_MAILBOX_REQUEST,
+  PARTIAL_SYNC_MAILBOX_SUCCESS,
+  PARTIAL_SYNC_MAILBOX_FAILURE,
   MOVE_CARD,
 } from '../constants';
 
@@ -22,6 +25,104 @@ function getInsertIndexByDate(array, date) {
         else { high = mid; }
     }
     return low;
+}
+
+function findAndRemoveInLabel(removedMessage, label) {
+  // find the thread that message belongs to
+  const threadIndex = label.threads.findIndex(item => item.id === removedMessage.threadId);
+  if (threadIndex === -1) {
+    // does not belong to any thread in label: label not affected, return label
+    return label;
+  }
+  const thread = label.threads[threadIndex];
+  let indexToRemoveFrom = -1;
+  // find message in thread to remove it
+  for (var i = 0; i < thread.emails.length; i++) {
+    let email = thread.emails[i];
+    if (email.id === removedMessage.id) {
+      indexToRemoveFrom = i; // this is the index of the email in the thread's list of emails
+      break
+    }
+  }
+
+  // message not in the thread: label not affected, return label
+  if (indexToRemoveFrom === -1) { return label; }
+
+  // if the message in thread, delete message from thread
+  thread.emails.splice(indexToRemoveFrom, 1);
+
+  // if there are no messages remaining in thread, delete thread;
+  if (thread.emails.length === 0) {
+    label.threads.splice(threadIndex, 1);
+    return label;
+  } else {
+    // update thread unread flag
+    // if the message removed is read, no effect on the unread label of the thread
+    if (removedMessage.labelIds.indexOf('UNREAD') > -1) {
+      // only need to update flag if message removed is unread
+      thread.unread = checkThreadUnread(thread);
+    }
+    label.threads[threadIndex] = thread;
+    return label;
+  }
+}
+
+function findAndUpdateInLabel(changedMessage, label) {
+  const threadId = changedMessage.threadId;
+  const threadIndex = label.threads.findIndex(item => item.id === changedMessage.threadId);
+  if (threadIndex === -1) {
+    // thread doesn't exist, create new thread for message
+    // find insertion index
+    const insertionIndex = getInsertIndexByDate(label.threads, changedMessage.date);
+    const newThread = {
+      id: changedMessage.threadId,
+      emails: [changedMessage],
+      historyId: changedMessage.historyId,
+      date: changedMessage.date,
+      to: changedMessage.to,
+      from: changedMessage.from,
+      snippet: changedMessage.snippet,
+      content: changedMessage.content,
+      subject: changedMessage.subject,
+      labelIds: changedMessage.labelIds,
+      unread: changedMessage.labelIds.indexOf('UNREAD') > -1 ? true: false,
+    }
+    label.threads.splice(insertionIndex, 0, newThread)
+    return label;
+  }
+
+  const relevantThread = label.threads[threadIndex];
+  const index = relevantThread.emails.findIndex(item => item.id === changedMessage.id)
+  if (index === -1) {
+    // not in current messages, add to message
+    const insertionIndex = getInsertIndexByDate(relevantThread.emails, changedMessage.date)
+    relevantThread.emails.splice(insertionIndex, 0, changedMessage)
+  } else {
+    // message already inside, just change
+    relevantThread.emails[index] = changedMessage;
+  }
+
+  if (changedMessage.labelIds.indexOf('UNREAD') > -1) {
+    relevantThread.unread = true;
+  } else {
+    if (relevantThread.unread) {
+      // check if thread is still overall unread, and update accordingly
+      relevantThread.unread = checkThreadUnread(relevantThread);
+    }
+  }
+  label.threads[threadIndex] = relevantThread;
+  return label;
+}
+
+function checkThreadUnread(thread) {
+  let unread = false;
+  for (var i = 0; i < thread.emails.length; i++) {
+    if (thread.emails[i].labelIds.indexOf('UNREAD') > -1) {
+      unread = true;
+      break;
+    }
+  }
+  return unread;
 }
 
 const initialState = new Map();
@@ -140,39 +241,66 @@ export default function mailbox(state = initialState, action) {
           .setIn([action.labelId, 'isFetching'], false)
       });
     }
+    case PARTIAL_SYNC_MAILBOX_REQUEST:
+      return state;
+    case PARTIAL_SYNC_MAILBOX_SUCCESS: {
+      if (!action.changed) {
+        return state;
+      }
+      const jsState = state.toJS();
+      const labelIds = Object.keys(jsState);
+      // update changed messages
+      for (var i = 0; i < action.messagesChanged.length; i++) {
+        let changedMessage = action.messagesChanged[i];
+        for (var idx = 0; idx < labelIds.length; idx++) {
+          let labelId = labelIds[idx];
+          if (changedMessage.labelIds.indexOf(labelId) > -1) {
+            // find it in the relevant thread in the label and change it
+            let newLabel = findAndUpdateInLabel(changedMessage, jsState[labelId]);
+            jsState[labelId] = newLabel;
+          }
+        }
+      }
+      // update removed messages
+      for (var i = 0; i < action.messagesRemovedFromLabels.length; i++) {
+        let removedMessage = action.messagesRemovedFromLabels[i];
+        for (var idx = 0; idx < labelIds.length; idx++) {
+          let labelId = labelIds[idx];
+          let newLabel = findAndRemoveInLabel(removedMessage, jsState[labelId])
+          jsState[labelId] = newLabel;
+        }
+      }
+
+      //TODO: if trash is one of the labels shown, then need to do something else
+      // a message with trash should only appear in trash label and not in other labels, even if there are other labels present
+      if (labelIds.indexOf('TRASH') === -1) {
+        // if trash is not one of the labels to show, do the same thing as messagesRemovedFromLabels
+        for (var i = 0; i < action.messagesTrashed.length; i++) {
+          let trashedMessage = action.messagesTrashed[i];
+          for (var idx = 0; idx < labelIds.length; idx++) {
+            let labelId = labelIds[idx];
+            let newLabel = findAndRemoveInLabel(trashedMessage, jsState[labelId])
+            jsState[labelId] = newLabel;
+          }
+        }
+      }
+
+      // messages that are completely deleted (even in trash), same procedure as removedMessages
+      for (var i = 0; i < action.messagesDeleted.length; i++) {
+        let deletedMessage = action.messagesDeleted[i];
+        for (var idx = 0; idx < labelIds.length; idx++) {
+          let labelId = labelIds[idx];
+          let newLabel = findAndRemoveInLabel(deletedMesage, jsState[labelId])
+          jsState[labelId] = newLabel;
+        }
+      }
+
+      return fromJS(jsState);
+    }
+    case PARTIAL_SYNC_MAILBOX_FAILURE:
+      return state;
     default:
       return state;
   }
 }
-
-// export default function mailbox(state = initialState, action) {
-//   switch (action.type) {
-//     case SET_MAILBOX:
-//       return fromJS(action.payload.mailbox);
-//     case CLEAR_MAILBOX:
-//       return null;
-//     case SET_GOOGLE_LABEL_INFO:
-//       return state.set('gmail', fromJS(action.info))
-//     case SET_GOOGLE_LATEST_UNREAD_THREADS:
-//       return state.withMutations((ctx) => {
-//         ctx.set('threadList', fromJS(action.payload.threadList))
-//             .set('fetchedThreads', fromJS(action.payload.fetchedThreads))
-//             .set('resultSizeEstimate', fromJS(action.payload.resultSizeEstimate))
-//       });
-//     case SET_GOOGLE_AUTH:
-//       return state.set('googleAuth', fromJS(action.payload.auth))
-
-//     // case SYNC_MAILBOX_PROFILE:
-//     //   return state.set('isSyncing', true)
-//     // case SYNC_MAILBOX_PROFILE_SUCCESS:
-//     //   return state.set('isSyncing', false)
-//     // case SYNC_MAILBOX_PROFILE_FAILURE:
-//     //   return state.withMutations((ctx) => {
-//     //     ctx.set('isSyncing', false)
-//     //         .set('err', action.err);
-//     //   });
-//     default:
-//       return state;
-//   }
-// }
 

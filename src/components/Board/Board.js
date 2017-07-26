@@ -16,6 +16,7 @@ function mapStateToProps(state) {
   const jsState = state.toJS();
   return {
     user: jsState.user,
+    labels: jsState.labels,
     labelsToShow: jsState.labels.labelsToShow,
     mailbox: jsState.mailbox,
     allLabels: jsState.labels.allLabels,
@@ -30,6 +31,7 @@ class Board extends React.Component {
 
   static propTypes = {
     labelsToShow: PropTypes.array.isRequired,
+    labels: PropTypes.object,
     mailbox: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     allLabels: PropTypes.array,
@@ -41,7 +43,7 @@ class Board extends React.Component {
     this.moveList = this.moveList.bind(this);
     this.findList = this.findList.bind(this);
     this.tick = this.tick.bind(this);
-    this.syncMailBoxLabel = this.syncMailBoxLabel.bind(this);
+    this.requestPartialSyncMailBox = this.requestPartialSyncMailBox.bind(this);
     this.fetchAllLabelsAction = this.fetchAllLabelsAction.bind(this);
     this.scrollRight = this.scrollRight.bind(this);
     this.scrollLeft = this.scrollLeft.bind(this);
@@ -51,10 +53,12 @@ class Board extends React.Component {
   }
 
   tick() {
-    const { user, labelsToShow, mailbox } = this.props;
-    for (var i = 0; i < labelsToShow.length; i++) {
-      this.syncMailBoxLabel(user, mailbox[labelsToShow[i]])
-    }
+    this.requestPartialSyncMailBox();
+    // const { user, labels, mailbox } = this.props;
+    // this.partialSyncMailBox(user, labels, mailbox);
+    // for (var i = 0; i < labelsToShow.length; i++) {
+    //   this.syncMailBoxLabel(user, mailbox[labelsToShow[i]])
+    // }
   }
 
   fetchAllLabelsTick() {
@@ -63,13 +67,14 @@ class Board extends React.Component {
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
-    this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
+    this.interval = setInterval(this.tick, 30*1000);
+    // this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
+    // this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval)
-    clearInterval(this.fetchAllLabelsInterval)
+    // clearInterval(this.interval)
+    // clearInterval(this.fetchAllLabelsInterval)
   }
 
   startScrolling(direction) {
@@ -105,8 +110,8 @@ class Board extends React.Component {
     this.setState({ isScrolling: false }, clearInterval(this.scrollInterval));
   }
 
-  syncMailBoxLabel(user, label) {
-    this.props.syncMailBoxLabel(user, label);
+  requestPartialSyncMailBox(user, labels, mailbox) {
+    this.props.requestPartialSyncMailBox(user, labels, mailbox);
   }
 
   fetchAllLabelsAction(user) {
@@ -136,7 +141,7 @@ class Board extends React.Component {
     return (
       <div className={s.root}>
         <CustomDragLayer snapToGrid={false} />
-        {labelsToShow.map((item, i) =>
+        {Object.keys(mailbox).length === labelsToShow.length && labelsToShow.map((item, i) =>
           <CardsContainer
             key={mailbox[item].id}
             labelId={mailbox[item].id}
@@ -149,7 +154,8 @@ class Board extends React.Component {
             x={i}
           />
         )}
-        <PlaceholdCardsContainer allLabels={allLabels} />
+
+        {Object.keys(mailbox).length === labelsToShow.length && <PlaceholdCardsContainer allLabels={allLabels} />}
       </div>
     )
   }

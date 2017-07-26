@@ -21,6 +21,7 @@ export function refreshToken(user) {
 export function fetchLabelInfo(user, labelId) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/labels/";
   return fetch(url + labelId, {
+    method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
     .then(response => response.json())
@@ -29,6 +30,7 @@ export function fetchLabelInfo(user, labelId) {
 export function fetchAllLabels(user) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/labels";
   return fetch(url, {
+    method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
     .then(response => response.json())
@@ -57,6 +59,15 @@ export function fetchMultipleLabelInfo(user, labelIds) {
   return Promise.all(allFetches)
 }
 
+export function fetchHistory(user, startHistoryId, query = null) {
+  let url = 'https://www.googleapis.com/gmail/v1/users/me/history' + '?startHistoryId=' + startHistoryId;
+  return fetch(url, {
+    method: 'GET',
+    headers: { "Authorization": "Bearer " + user.accessToken },
+  })
+    .then(response => response.json())
+}
+
 /* **************************************************************************/
 // Fetch Emails and messages
 /* **************************************************************************/
@@ -64,6 +75,7 @@ export function fetchMultipleLabelInfo(user, labelIds) {
 export function fetchMessageIds(user, query) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/messages";
   return fetch(url + query, {
+    method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
     .then(response => response.json())
@@ -72,6 +84,7 @@ export function fetchMessageIds(user, query) {
 export function fetchThreadIds(user, query) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/threads";
   return fetch(url + query, {
+    method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
     .then(response => response.json())
@@ -80,17 +93,34 @@ export function fetchThreadIds(user, query) {
 export function fetchThread(user, threadId) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/threads/";
   return fetch(url + threadId, {
+    method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
-    .then(response => response.json())
+    .then(response => {
+      if (response.status === 404) {
+        // thread has been deleted or doesn't exist
+        return { id: threadId, deleted: true, }
+      } else {
+        return response.json()
+      }
+    })
+
 }
 
 export function fetchMessage(user, messageId) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/messages/";
   return fetch(url + messageId, {
+    method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
-    .then(response => response.json())
+    .then(response => {
+      if (response.status === 404) {
+        // message has been deleted or doesn't exist
+        return { id: messageId, deleted: true, }
+      } else {
+        return response.json()
+      }
+    })
 }
 
 export function fetchManyThreads(user, threadIds) {
