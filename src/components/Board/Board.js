@@ -51,6 +51,7 @@ class Board extends React.Component {
     this.state = { isScrolling: false };
     this.partialSyncTick = this.partialSyncTick.bind(this);
     this.fetchAllLabelsTick = this.fetchAllLabelsTick.bind(this);
+    this.addLabelLane = this.addLabelLane.bind(this);
   }
 
   partialSyncTick() {
@@ -122,6 +123,10 @@ class Board extends React.Component {
     this.props.moveList(lastX, nextX);
   }
 
+  addLabelLane() {
+    this.props.addLabelLane();
+  }
+
   findList(id) {
     const { mailbox, labelsToShow } = this.props;
 
@@ -133,24 +138,43 @@ class Board extends React.Component {
 
   render() {
     const { mailbox, labelsToShow, allLabels } = this.props;
+
+    // wait for data to fetch, maybe should find a better way to do this...
+    // TODO: remove this hack when loading data from db, load labels first before loading
+    // labelsToShow
+    // this should be done somewhere else...
+    let canShow = true;
+    for (var i = 0; i < labelsToShow.length; i++) {
+      if (Object.keys(mailbox).indexOf(labelsToShow[i]) === -1) {
+        canShow = false;
+        break
+      }
+    }
+
     return (
       <div className={s.root}>
         <CustomDragLayer snapToGrid={false} />
-        {Object.keys(mailbox).length === labelsToShow.length && labelsToShow.map((item, i) =>
+        {canShow && labelsToShow.map((item, i) =>
           <CardsContainer
-            key={mailbox[item].id}
-            labelId={mailbox[item].id}
+            // key={mailbox[item].id}
+            key={i}
+            labelId={mailbox[item] && mailbox[item].id}
             item={mailbox[item]}
             moveCard={this.moveCard}
             moveList={this.moveList}
             startScrolling={this.startScrolling}
             stopScrolling={this.stopScrolling}
             isScrolling={this.state.isScrolling}
+            allLabels={allLabels}
             x={i}
           />
         )}
 
-        {Object.keys(mailbox).length === labelsToShow.length && <PlaceholdCardsContainer allLabels={allLabels} />}
+        {canShow &&
+          <PlaceholdCardsContainer
+            key='placeholder'
+            addLabelLane={this.addLabelLane}
+            allLabels={allLabels} />}
       </div>
     )
   }

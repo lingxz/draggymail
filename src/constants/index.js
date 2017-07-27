@@ -34,3 +34,5 @@ export const TOGGLE_DRAGGING = 'TOGGLE_DRAGGING';
 
 export const GMAIL_UNREAD_SYNC_MS = 10 * 1000; // every 10 seconds
 export const FETCH_ALL_MAILBOX_LABELS = 30 * 60 * 1000; // every 30 minutes
+
+export const ADD_LABEL_LANE = 'ADD_LABEL_LANE';

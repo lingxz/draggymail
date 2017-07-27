@@ -14,6 +14,7 @@ import {
   TOGGLE_DRAGGING,
   UPDATE_USER_CREDENTIALS,
   PARTIAL_SYNC_MAILBOX_REQUEST,
+  ADD_LABEL_LANE,
 } from '../constants';
 
 export function moveList(lastX, nextX) {
@@ -260,6 +261,10 @@ export function syncMailBoxLabel(user, label) {
 
       })
   }
+}
+
+export function addLabelLane() {
+  return ({ type: ADD_LABEL_LANE })
 }
 
 export function requestPartialSyncMailBox() {

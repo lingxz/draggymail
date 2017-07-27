@@ -8,6 +8,7 @@ import {
   LIST_ALL_LABELS_REQUEST,
   LIST_ALL_LABELS_SUCCESS,
   LIST_ALL_LABELS_FAILURE,
+  ADD_LABEL_LANE,
 } from '../constants';
 
 
@@ -21,6 +22,11 @@ const initialState = fromJS({
 // const initialState = new InitialState;
 export default function labels(state = initialState, action) {
   switch (action.type) {
+    case ADD_LABEL_LANE: {
+      const newLabelsToShow = state.toJS().labelsToShow
+      newLabelsToShow.push(newLabelsToShow[0] || 'INBOX');
+      return state.set('labelsToShow', fromJS(newLabelsToShow))
+    }
     case LIST_ALL_LABELS_REQUEST:
       return state;
     case LIST_ALL_LABELS_SUCCESS:

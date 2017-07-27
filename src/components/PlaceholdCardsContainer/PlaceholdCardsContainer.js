@@ -7,16 +7,7 @@ class PlaceholdCardsContainer extends React.Component {
 
   static propTypes = {
     allLabels: PropTypes.array,
-  }
-
-  constructor(props) {
-    super(props);
-    this.toggleShowLabels = this.toggleShowLabels.bind(this);
-    this.state = { showLabels: false };
-  }
-
-  toggleShowLabels() {
-    this.setState({ showLabels: !this.state.showLabels })
+    addLabelLane: PropTypes.func,
   }
 
   render() {
@@ -24,12 +15,7 @@ class PlaceholdCardsContainer extends React.Component {
 
     return (
       <div className={s.root}>
-        <button className={s.button} onClick={this.toggleShowLabels}>+</button>
-        <div className={ this.state.showLabels ? null : s.hidden }>
-          {allLabels.map((item, i) =>
-            <p>{item.name}</p>
-          )}
-        </div>
+        <button className={s.button} onClick={this.props.addLabelLane}>+</button>
       </div>
     )
   }
