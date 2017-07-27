@@ -65,7 +65,13 @@ export function fetchHistory(user, startHistoryId, query = null) {
     method: 'GET',
     headers: { "Authorization": "Bearer " + user.accessToken },
   })
-    .then(response => response.json())
+    .then(response => {
+      if (response.status === 404 || response.status === 400) {
+        return { invalidHistoryId: true }
+      } else {
+        return response.json();
+      }
+    })
 }
 
 /* **************************************************************************/

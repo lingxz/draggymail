@@ -1,12 +1,9 @@
 import { fromJS, Map } from 'immutable';
 import {
-  CLEAR_MAILBOX,
-  SYNC_MAILBOX_LABEL_START,
+  SYNC_MAILBOX_LABEL_REQUEST,
   SYNC_MAILBOX_LABEL_SUCCESS,
   SYNC_MAILBOX_LABEL_FAILURE,
-  SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE,
-  SYNC_MAILBOX_LATEST_UNREAD_THREADS,
-  GET_MAILBOX_LABEL_INFO_START,
+  GET_MAILBOX_LABEL_INFO_REQUEST,
   GET_MAILBOX_LABEL_INFO_SUCCESS,
   GET_MAILBOX_LABEL_INFO_FAILURE,
   PARTIAL_SYNC_MAILBOX_REQUEST,
@@ -166,7 +163,7 @@ export default function mailbox(state = initialState, action) {
         })
       }
     }
-    case SYNC_MAILBOX_LABEL_START:
+    case SYNC_MAILBOX_LABEL_REQUEST:
       return state.setIn([action.labelId, 'isFetching'], true)
     case SYNC_MAILBOX_LABEL_FAILURE:
       return state.setIn([action.labelId, 'isFetching'], false)
@@ -189,27 +186,7 @@ export default function mailbox(state = initialState, action) {
         ctx.setIn([action.labelId, 'threads'], fromJS(action.threads))
       })
     }
-    case SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE:
-      return state.setIn([action.labelId, 'isFetching'], false)
-    case SYNC_MAILBOX_LATEST_UNREAD_THREADS: {
-      // const changedThreadIds = action.threads.map(item => item.id)
-      const currentThreadList = state.get(action.labelId).get('threads');
-
-      let newThreadList = currentThreadList;
-      for (var i = 0; i < action.threads.length; i++) {
-        let changedThread = action.threads[i];
-        let changedIndex = newThreadList.findIndex((item) => {
-          return item.get('id') === changedThread.id;
-        })
-        newThreadList = newThreadList.update(changedIndex, item => fromJS(changedThread))
-      }
-
-      return state.withMutations((ctx) => {
-        ctx.setIn([action.labelId, 'latestUnreadThreads'], action.threads)
-        ctx.setIn([action.labelId, 'threads'], newThreadList)
-      })
-    }
-    case GET_MAILBOX_LABEL_INFO_START:
+    case GET_MAILBOX_LABEL_INFO_REQUEST:
       return state.setIn([action.labelId, 'isFetching'], true)
     case GET_MAILBOX_LABEL_INFO_FAILURE:
       return state.setIn([action.labelId, 'isFetching'], false)

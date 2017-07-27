@@ -1,6 +1,7 @@
 import { select, race, take, takeEvery, takeLatest, call, put, all } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import { getUser, getLabelIds } from './selectors';
+import * as MailBoxActions from '../actions/mailbox';
 import {
   FULL_SYNC_MAILBOX_REQUEST,
   FULL_SYNC_MAILBOX_FAILURE,

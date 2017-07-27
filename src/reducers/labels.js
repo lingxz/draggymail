@@ -1,15 +1,13 @@
 import { Record, List, fromJS } from 'immutable';
 
 import {
-  GET_LISTS,
-  GET_LISTS_START,
   MOVE_CARD,
   MOVE_LIST,
   TOGGLE_DRAGGING,
-  GET_ALL_MAILBOX_LABELS_START,
-  GET_ALL_MAILBOX_LABELS_SUCCESS,
-  GET_ALL_MAILBOX_LABELS_FAILURE,
   UPDATE_HISTORY_ID,
+  LIST_ALL_LABELS_REQUEST,
+  LIST_ALL_LABELS_SUCCESS,
+  LIST_ALL_LABELS_FAILURE,
 } from '../constants';
 
 
@@ -23,12 +21,12 @@ const initialState = fromJS({
 // const initialState = new InitialState;
 export default function labels(state = initialState, action) {
   switch (action.type) {
-    case GET_ALL_MAILBOX_LABELS_START:
-      return state.set('isFetching', true)
-    case GET_ALL_MAILBOX_LABELS_SUCCESS:
-      return state.set('allLabels', fromJS(action.labels))
-    case GET_ALL_MAILBOX_LABELS_FAILURE:
-      return state.set('isFetching', false)
+    case LIST_ALL_LABELS_REQUEST:
+      return state;
+    case LIST_ALL_LABELS_SUCCESS:
+      return state.set('allLabels', fromJS(action.labels));
+    case LIST_ALL_LABELS_FAILURE:
+      return state;
     case UPDATE_HISTORY_ID: {
       const currentHistoryId = state.toJS().latestHistoryId || '';
       if (action.latestHistoryId > currentHistoryId) {

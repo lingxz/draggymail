@@ -1,22 +1,17 @@
 import * as GmailActions from './gmail';
 import DataLoader from 'dataloader';
 import {
-  SYNC_MAILBOX_LABEL_START,
+  SYNC_MAILBOX_LABEL_REQUEST,
   SYNC_MAILBOX_LABEL_SUCCESS,
   SYNC_MAILBOX_LABEL_FAILURE,
   SYNC_MAILBOX_LABEL_SUCCESS_NO_CHANGE,
-  GET_MAILBOX_LABEL_INFO_START,
+  GET_MAILBOX_LABEL_INFO_REQUEST,
   GET_MAILBOX_LABEL_INFO_SUCCESS,
   GET_MAILBOX_LABEL_INFO_FAILURE,
-  SYNC_MAILBOX_LATEST_UNREAD_THREADS,
-  GET_LISTS,
-  GET_LISTS_START,
+  LIST_ALL_LABELS_REQUEST,
   MOVE_CARD,
   MOVE_LIST,
   TOGGLE_DRAGGING,
-  GET_ALL_MAILBOX_LABELS_START,
-  GET_ALL_MAILBOX_LABELS_SUCCESS,
-  GET_ALL_MAILBOX_LABELS_FAILURE,
   UPDATE_USER_CREDENTIALS,
   PARTIAL_SYNC_MAILBOX_REQUEST,
 } from '../constants';
@@ -174,29 +169,26 @@ export function refreshAuth(user) {
     })
 }
 
-export function authNeedsRefresh(user) {
-  // if expiry is less than one minute away, refresh token
-  const currentTime = (new Date()).getTime();
-  const timeToExpiry = user.expiryTime - currentTime;
-  if (timeToExpiry < 60 * 1000) {
-    return true
-  } else {
-    return false
-  }
+export function requestFetchAllLabels() {
+  return { type: LIST_ALL_LABELS_REQUEST }
 }
 
-export function fetchAllLabelsAction(user) {
-  return async (dispatch) => {
-    if (authNeedsRefresh(user)) {
-      user = await refreshAuth(user);
-      dispatch({ type: UPDATE_USER_CREDENTIALS, user })
-    }
-    dispatch({ type: GET_ALL_MAILBOX_LABELS_START })
-    return GmailActions.fetchAllLabels(user)
-      .then(data => dispatch({ type: GET_ALL_MAILBOX_LABELS_SUCCESS, labels: data.labels }))
-      .catch(err => dispatch({ type: GET_ALL_MAILBOX_LABELS_FAILURE, err }))
-  }
+export function fetchAllLabels(user) {
+  return GmailActions.fetchAllLabels(user)
 }
+
+// export function fetchAllLabelsAction(user) {
+//   return async (dispatch) => {
+//     if (authNeedsRefresh(user)) {
+//       user = await refreshAuth(user);
+//       dispatch({ type: UPDATE_USER_CREDENTIALS, user })
+//     }
+//     dispatch({ type: GET_ALL_MAILBOX_LABELS_START })
+//     return GmailActions.fetchAllLabels(user)
+//       .then(data => dispatch({ type: GET_ALL_MAILBOX_LABELS_SUCCESS, labels: data.labels }))
+//       .catch(err => dispatch({ type: GET_ALL_MAILBOX_LABELS_FAILURE, err }))
+//   }
+// }
 
 export function fullSyncMailBoxLabel(user, label) {
   const params = {
@@ -260,56 +252,6 @@ export function fullSyncMultipleLabels(user, labelIds) {
     })
 }
 
-export function fullSyncMultipleLabelsAction(user, labelIds) {
-  return async (dispatch) => {
-    if (authNeedsRefresh(user)) {
-      user = await refreshAuth(user);
-      dispatch({ type: UPDATE_USER_CREDENTIALS, user })
-    }
-    for (var idx = 0; idx < labelIds.length; idx++) {
-      dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId: labelIds[idx] })
-    }
-    try {
-      return GmailActions.fetchMultipleLabelInfo(user, labelIds)
-        .then(data => {
-          for (var i = 0; i < data.length; i++) {
-            let labelInfo = data[i];
-            dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: labelInfo.id, payload: labelInfo })
-          }
-          for (var idx = 0; idx < labelIds.length; idx++) {
-            dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: labelIds[idx] })
-          }
-          return fullSyncMultipleLabels(user, labelIds);
-        })
-        .then(data => {
-          for (var key in data) {
-            dispatch({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: key, threads: data[key] })
-          }
-        })
-    }
-    catch(err) {
-      for (var idx = 0; idx < labelIds.length; i++) {
-        dispatch({ type: GET_MAILBOX_LABEL_INFO_FAILURE, labelId: labelIds[idx], err })
-        dispatch({ type: SYNC_MAILBOX_LABEL_FAILURE, labelId: labelIds[idx], err })
-      }
-    }
-  }
-}
-
-
-export function getMailBoxLabelInfo(user, labelId) {
-  return dispatch => {
-    dispatch({ type: GET_MAILBOX_LABEL_INFO_START, labelId })
-    try {
-      return GmailActions.fetchLabelInfo(user, labelId)
-        .then(response => dispatch({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId, payload: response }))
-    }
-    catch(err) {
-      return dispatch({ type: GET_MAILBOX_LABEL_INFO_FAILURE, labelId, err })
-    }
-  }
-}
-
 export function syncMailBoxLabel(user, label) {
   return (dispatch) => {
     dispatch({ type: SYNC_MAILBOX_LABEL_START, labelId: label.id });
@@ -325,10 +267,14 @@ export function requestPartialSyncMailBox() {
 }
 
 export function partialSyncMailBox(user, labels, mailbox) {
-  // TODO need to retrieve according to next page token
-  console.log(labels);
+  // TODO: need to retrieve according to next page token
+  // TODO: trigger full sync if fetch history returns 404
+  if (!labels.latestHistoryId) { return { requestFullSync: true } }
   return GmailActions.fetchHistory(user, labels.latestHistoryId)
     .then(data => {
+      if (data.invalidHistoryId) {
+        return { requestFullSync: true }
+      }
       if (data.historyId == labels.latestHistoryId) {
         // nothing changed
         return { changed: false }

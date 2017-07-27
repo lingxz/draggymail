@@ -9,9 +9,10 @@ function action({ store, fetch }) {
     return { redirect: '/login' }
   }
 
-  store.dispatch({ type: "FULL_SYNC_MAILBOX_REQUEST" })
-
-  // const labels = ['INBOX', 'Label_203'];
+  if (!store.getState().toJS().labels.latestHistoryId) {
+    store.dispatch({ type: "FULL_SYNC_MAILBOX_REQUEST" })
+    store.dispatch({ type: "LIST_ALL_LABELS_REQUEST" })
+  }
 
   return {
     chunks: ['kanban'],

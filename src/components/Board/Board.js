@@ -42,39 +42,34 @@ class Board extends React.Component {
     this.moveCard = this.moveCard.bind(this);
     this.moveList = this.moveList.bind(this);
     this.findList = this.findList.bind(this);
-    this.tick = this.tick.bind(this);
     this.requestPartialSyncMailBox = this.requestPartialSyncMailBox.bind(this);
-    this.fetchAllLabelsAction = this.fetchAllLabelsAction.bind(this);
+    this.requestFetchAllLabels = this.requestFetchAllLabels.bind(this);
     this.scrollRight = this.scrollRight.bind(this);
     this.scrollLeft = this.scrollLeft.bind(this);
     this.stopScrolling = this.stopScrolling.bind(this);
     this.startScrolling = this.startScrolling.bind(this);
     this.state = { isScrolling: false };
+    this.partialSyncTick = this.partialSyncTick.bind(this);
+    this.fetchAllLabelsTick = this.fetchAllLabelsTick.bind(this);
   }
 
-  tick() {
+  partialSyncTick() {
     this.requestPartialSyncMailBox();
-    // const { user, labels, mailbox } = this.props;
-    // this.partialSyncMailBox(user, labels, mailbox);
-    // for (var i = 0; i < labelsToShow.length; i++) {
-    //   this.syncMailBoxLabel(user, mailbox[labelsToShow[i]])
-    // }
   }
 
   fetchAllLabelsTick() {
-    const { user } = this.props;
-    this.fetchAllLabelsAction(user);
+    this.requestFetchAllLabels();
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.tick, 30*1000);
+    this.partialSyncInterval = setInterval(this.partialSyncTick, 30*1000);
     // this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
-    // this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
+    this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
   }
 
   componentWillUnmount() {
-    // clearInterval(this.interval)
-    // clearInterval(this.fetchAllLabelsInterval)
+    clearInterval(this.partialSyncInterval)
+    clearInterval(this.fetchAllLabelsInterval)
   }
 
   startScrolling(direction) {
@@ -110,12 +105,12 @@ class Board extends React.Component {
     this.setState({ isScrolling: false }, clearInterval(this.scrollInterval));
   }
 
-  requestPartialSyncMailBox(user, labels, mailbox) {
-    this.props.requestPartialSyncMailBox(user, labels, mailbox);
+  requestPartialSyncMailBox() {
+    this.props.requestPartialSyncMailBox();
   }
 
-  fetchAllLabelsAction(user) {
-    this.props.fetchAllLabelsAction(user);
+  requestFetchAllLabels() {
+    this.props.requestFetchAllLabels();
   }
 
   moveCard(lastX, lastY, nextX, nextY) {
