@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { DropTarget, DragSource } from 'react-dnd';
-import Dropdown from 'react-dropdown';
 import Select from 'react-select';
 import s from './CardsContainer.css';
 import Cards from '../Card';
