@@ -158,7 +158,7 @@ class Board extends React.Component {
           <CardsContainer
             // key={mailbox[item].id}
             key={i}
-            labelId={mailbox[item] && mailbox[item].id}
+            labelId={mailbox[item].id}
             item={mailbox[item]}
             moveCard={this.moveCard}
             moveList={this.moveList}

@@ -2,8 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { DropTarget, DragSource } from 'react-dnd';
+import Dropdown from 'react-dropdown';
+import Select from 'react-select';
 import s from './CardsContainer.css';
 import Cards from '../Card';
+import rs from 'react-select/dist/react-select.css';
 
 const listSource = {
   beginDrag(props) {
@@ -70,17 +73,39 @@ class CardsContainer extends React.Component {
     isDragging: PropTypes.bool,
     startScrolling: PropTypes.func,
     stopScrolling: PropTypes.func,
-    isScrolling: PropTypes.bool
+    isScrolling: PropTypes.bool,
+    allLabels: PropTypes.array,
   }
 
 
 	render() {
-    const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging } = this.props;
+    const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging, allLabels } = this.props;
     const threads = item.threads || [];
+
+    // construct options, react select requires options to be in specific format
+    const options = [];
+    for (var i = 0; i < allLabels.length; i++) {
+      options.push({
+        value: allLabels[i].id,
+        label: allLabels[i].name
+      })
+    }
+    console.log(options);
+    function logChange(val) {
+      console.log("Selected: " + JSON.stringify(val));
+    }
+
 	  return connectDragSource(connectDropTarget(
       <div className={s.root}>
         <div className={s.head}>
-          <div className={s.name}>{item.name}</div>
+          <div className={s.name}>
+            <Select
+              name="label"
+              value={item.id}
+              options={options}
+              onChange={logChange}
+            />
+          </div>
         </div>
         <div className={s.items}>
           <Cards
@@ -100,4 +125,4 @@ class CardsContainer extends React.Component {
 	}
 }
 
-export default DropTarget('list', listTarget, collectDropTarget)(DragSource('list', listSource, collectDragSource)(withStyles(s)(CardsContainer)))
+export default DropTarget('list', listTarget, collectDropTarget)(DragSource('list', listSource, collectDragSource)(withStyles(rs)(withStyles(s)(CardsContainer))))
