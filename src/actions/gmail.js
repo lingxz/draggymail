@@ -1,10 +1,6 @@
-export function refreshToken(user) {
+export function refreshToken(user, fetch) {
   return fetch('/api/google/refreshtoken', {
     method: 'POST',
-    credentials: 'same-origin',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify({
       refreshToken: user.refreshToken,
       accessToken: user.accessToken,

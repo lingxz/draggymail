@@ -267,7 +267,7 @@ export default function mailbox(state = initialState, action) {
         let deletedMessage = action.messagesDeleted[i];
         for (var idx = 0; idx < labelIds.length; idx++) {
           let labelId = labelIds[idx];
-          let newLabel = findAndRemoveInLabel(deletedMesage, jsState[labelId])
+          let newLabel = findAndRemoveInLabel(deletedMessage, jsState[labelId])
           jsState[labelId] = newLabel;
         }
       }

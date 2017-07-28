@@ -156,8 +156,8 @@ function sortAndProcessMessages(messages, labelIds) {
 }
 
 
-export function refreshAuth(user) {
-  return GmailActions.refreshToken(user)
+export function refreshAuth(user, fetch) {
+  return GmailActions.refreshToken(user, fetch)
     .then(data => {
       const newUser = {
         id: user.id,
