@@ -4,7 +4,7 @@ import { watchFullSyncMailBox, watchPartialSyncMailBox, watchFetchAllLabels } fr
 
 export default function* rootSaga(context) {
   yield all([
-    watchAuth(),
+    watchAuth(context),
     watchFullSyncMailBox(),
     watchPartialSyncMailBox(),
     watchFetchAllLabels(),

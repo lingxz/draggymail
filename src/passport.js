@@ -15,7 +15,7 @@
 
 import passport from 'passport';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
-import { User, UserLogin, UserClaim, UserProfile } from './data/models';
+import { User, UserLogin, UserClaim, UserProfile, Board, Label } from './data/models';
 import config from './config';
 
 /**
@@ -93,6 +93,7 @@ passport.use(new GoogleStrategy({
         console.log(user);
         console.log(refreshToken);
         // new login, create new user, store refresh token
+        // add default board and default label INBOX
         user = await User.create({
           email: profile.email,
           emailConfirmed: true,
@@ -108,13 +109,22 @@ passport.use(new GoogleStrategy({
             gender: profile._json.gender,
             picture: profile._json.image.url,
           },
+          boards: [
+            {
+              name: 'default',
+              labels: [{ labelId: 'INBOX', position: 0 }],
+            }
+          ]
         }, {
           include: [
             { model: UserLogin, as: 'logins' },
             { model: UserClaim, as: 'claims' },
             { model: UserProfile, as: 'profile' },
+            { model: Board, as: 'boards', include: [{ model: Label, as: 'labels' }] },
           ],
         });
+        console.log("here's the user")
+        console.log(user);
         done(null, {
           id: user.id,
           email: user.email,
