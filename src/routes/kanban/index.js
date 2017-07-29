@@ -15,8 +15,6 @@ function action({ store, fetch, req }) {
   // } else {
   //   const labelsToShow = store.getState().toJS().labels.labelsToShow;
   // }
-  console.log("user's labels======")
-  console.log(user.labels);
   if (!store.getState().toJS().labels.latestHistoryId) {
     store.dispatch({ type: FULL_SYNC_MAILBOX_REQUEST })
     store.dispatch({ type: LIST_ALL_LABELS_REQUEST })
