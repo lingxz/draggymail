@@ -8,7 +8,7 @@ import {
   LIST_ALL_LABELS_REQUEST,
   LIST_ALL_LABELS_SUCCESS,
   LIST_ALL_LABELS_FAILURE,
-  ADD_LABEL_LANE,
+  ADD_LABEL_TO_SHOW,
   UPDATE_LABELS_TO_SHOW,
 } from '../constants';
 
@@ -17,7 +17,7 @@ const initialState = fromJS({
   allLabels: [],
   isFetching: false,
   isDragging: false,
-  labelsToShow: ['INBOX', 'Label_203'],
+  labelsToShow: [],
 })
 /* eslint-enable new-cap */
 // const initialState = new InitialState;
@@ -25,7 +25,7 @@ export default function labels(state = initialState, action) {
   switch (action.type) {
     case UPDATE_LABELS_TO_SHOW:
       return state.set('labelsToShow', fromJS(action.labels))
-    case ADD_LABEL_LANE: {
+    case ADD_LABEL_TO_SHOW: {
       const newLabelsToShow = state.toJS().labelsToShow
       newLabelsToShow.push(newLabelsToShow[0] || 'INBOX');
       return state.set('labelsToShow', fromJS(newLabelsToShow))

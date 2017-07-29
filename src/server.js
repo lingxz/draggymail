@@ -34,6 +34,7 @@ import configureStore from './store/configureStore';
 import { login } from './actions/user';
 import { updateLabelsToShow } from './actions/mailbox';
 import config from './config';
+import apiRouter from './api';
 
 const app = express();
 
@@ -56,7 +57,7 @@ app.use(bodyParser.json());
 app.use(session({
   secret: config.auth.session.secret,
   resave: false,
-  saveUnitialized: false,
+  saveUninitialized: false,
   cookie: {
     maxAge: 60 * 60 * 24 * 180 * 1000,
   }
@@ -68,23 +69,23 @@ if (__DEV__) {
   app.enable('trust proxy');
 }
 
-app.post('/api/google/refreshtoken', (req, res) => {
-  const oauth = new google.auth.OAuth2(
-      config.auth.google.id,
-      config.auth.google.secret,
-      config.auth.returnURL,
-    )
-  oauth.setCredentials({
-    access_token: req.body.accessToken,
-    refresh_token: req.body.refreshToken,
-  })
-  oauth.refreshAccessToken((err, tokens) => {
-    req.user.accessToken = tokens.access_token;
-    tokens.expiryTime = tokens.expiry_date;
-    req.user.expiryTime = tokens.expiry_date;
-    res.send(tokens);
-  })
-})
+const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).send({ error: 'User not authenticated' });
+}
+
+const isAuthorized = (req, res, next) => {
+  if (req.user.accessToken) {
+    next();
+  } else {
+    res.status(401).send({ error: 'User not authorized' })
+  }
+}
+
+app.use('/api', isAuthenticated, isAuthorized, apiRouter);
+
 
 app.get('/login/google',
   passport.authenticate('google', {

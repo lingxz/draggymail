@@ -7,7 +7,7 @@ class PlaceholdCardsContainer extends React.Component {
 
   static propTypes = {
     allLabels: PropTypes.array,
-    addLabelLane: PropTypes.func,
+    addLabelToShow: PropTypes.func,
   }
 
   render() {
@@ -15,7 +15,7 @@ class PlaceholdCardsContainer extends React.Component {
 
     return (
       <div className={s.root}>
-        <button className={s.button} onClick={this.props.addLabelLane}>+</button>
+        <button className={s.button} onClick={this.props.addLabelToShow}>+</button>
       </div>
     )
   }

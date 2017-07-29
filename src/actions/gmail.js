@@ -1,5 +1,5 @@
 export function refreshToken(user, fetch) {
-  return fetch('/api/google/refreshtoken', {
+  return fetch('/api/google/refresh-token', {
     method: 'POST',
     body: JSON.stringify({
       refreshToken: user.refreshToken,

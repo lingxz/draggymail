@@ -1,6 +1,11 @@
 import { all } from 'redux-saga/effects'
 import { watchAuth } from './user';
-import { watchFullSyncMailBox, watchPartialSyncMailBox, watchFetchAllLabels } from './mailbox';
+import {
+  watchFullSyncMailBox,
+  watchPartialSyncMailBox,
+  watchFetchAllLabels,
+  watchAddLabelToShow,
+} from './mailbox';
 
 export default function* rootSaga(context) {
   yield all([
@@ -8,5 +13,6 @@ export default function* rootSaga(context) {
     watchFullSyncMailBox(),
     watchPartialSyncMailBox(),
     watchFetchAllLabels(),
+    watchAddLabelToShow(context),
   ])
 }

@@ -12,6 +12,7 @@ import {
   LIST_ALL_LABELS_REQUEST,
   LIST_ALL_LABELS_SUCCESS,
   LIST_ALL_LABELS_FAILURE,
+  ADD_LABEL_TO_SHOW,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -80,4 +81,28 @@ export function* watchPartialSyncMailBox() {
 
 export function* watchFetchAllLabels() {
   yield takeLatest(LIST_ALL_LABELS_REQUEST, fetchAllLabels)
+}
+
+export function* addLabelToShow() {
+  try {
+    const labelIds = yield select(getLabelIds);
+    const id = labelIds[labelIds.length - 1];
+    const position = labelIds.length - 1;
+    const opts = {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ labelId: id, position: position }) }
+    const res = yield call(fetch, '/api/add-label', opts);
+    if (!(res.status === 200)) { console.log(res.statusText) }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export function* watchAddLabelToShow({ fetch }) {
+  yield takeEvery(ADD_LABEL_TO_SHOW, addLabelToShow, fetch)
 }

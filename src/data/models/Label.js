@@ -21,10 +21,12 @@ const Label = Model.define('Label', {
   // gmail label id
   labelId: {
     type: DataType.STRING,
+    allowNull: false,
   },
 
   position: {
     type: DataType.INTEGER,
+    allowNull: false,
   }
 
 });

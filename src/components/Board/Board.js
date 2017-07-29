@@ -51,7 +51,7 @@ class Board extends React.Component {
     this.state = { isScrolling: false };
     this.partialSyncTick = this.partialSyncTick.bind(this);
     this.fetchAllLabelsTick = this.fetchAllLabelsTick.bind(this);
-    this.addLabelLane = this.addLabelLane.bind(this);
+    this.addLabelToShow = this.addLabelToShow.bind(this);
   }
 
   partialSyncTick() {
@@ -123,8 +123,8 @@ class Board extends React.Component {
     this.props.moveList(lastX, nextX);
   }
 
-  addLabelLane() {
-    this.props.addLabelLane();
+  addLabelToShow() {
+    this.props.addLabelToShow();
   }
 
   findList(id) {
@@ -173,7 +173,7 @@ class Board extends React.Component {
         {canShow &&
           <PlaceholdCardsContainer
             key='placeholder'
-            addLabelLane={this.addLabelLane}
+            addLabelToShow={this.addLabelToShow}
             allLabels={allLabels} />}
       </div>
     )

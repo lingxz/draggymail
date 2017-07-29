@@ -100,6 +100,7 @@ class CardsContainer extends React.Component {
           <div className={s.name}>
             <Select
               name="label"
+              clearable={false}
               value={item.id}
               options={options}
               onChange={logChange}
