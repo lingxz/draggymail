@@ -13,6 +13,10 @@ import {
   LIST_ALL_LABELS_SUCCESS,
   LIST_ALL_LABELS_FAILURE,
   ADD_LABEL_TO_SHOW,
+  CHANGE_LABEL_TO_SHOW,
+  CHANGE_LABEL_TO_SHOW_DB_SUCCESS,
+  CHANGE_LABEL_TO_SHOW_DB_FAILURE,
+  CHANGE_LABEL_TO_SHOW_SUCCESS,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -48,9 +52,12 @@ function* partialSyncMailBox(action) {
 
 function* fullSyncMailBox(action) {
    try {
-      // const labelsToShow = yield select(getLabelIds);
-      const labelsToShow = ['INBOX', 'Label_203'];
+      const tempLabels = yield select(getLabelIds);
       const user = yield select(getUser);
+      // remove duplicates
+      const labelsToShow = tempLabels.filter((elem, index, self) => {
+        return index === self.indexOf(elem);
+      });
 
       // get label info
       const labelsInfo = yield call(MailBoxActions.fetchMultipleLabelInfo, user, labelsToShow)
@@ -103,6 +110,46 @@ export function* addLabelToShow() {
   }
 }
 
+export function* changeLabelToShow(action) {
+  try {
+    const user = yield select(getUser);
+    const mailbox = yield select(getMailBox);
+    const labelId = action.newLabelId;
+    // check if already loaded
+    if (Object.keys(mailbox).indexOf(labelId) === -1) {
+      // only need to do full label sync if not this label is not loaded in store
+      const labelInfo = yield call(MailBoxActions.fetchLabelInfo, user, labelId)
+      yield put({ type: GET_MAILBOX_LABEL_INFO_SUCCESS, labelId: labelInfo.id, payload: labelInfo})
+      const threads = yield call(MailBoxActions.fullSyncMailBoxLabel, user, labelId);
+      yield put({ type: SYNC_MAILBOX_LABEL_SUCCESS, labelId: labelId, threads: threads })
+    }
+    // trigger partial sync
+    yield put({ type: PARTIAL_SYNC_MAILBOX_REQUEST })
+    // update database
+    const opts = {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ position: action.position, newLabelId: action.newLabelId }) }
+    const res = yield call(fetch, '/api/change-label', opts);
+    if (res.status === 200) {
+      // only update labelsToShow in store when all the data is loaded to prevent flickering
+      yield put({ type: CHANGE_LABEL_TO_SHOW_SUCCESS, position: action.position, newLabelId: action.newLabelId })
+    } else {
+      console.log(res.statusText);
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 export function* watchAddLabelToShow({ fetch }) {
   yield takeEvery(ADD_LABEL_TO_SHOW, addLabelToShow, fetch)
+}
+
+export function* watchChangeLabel() {
+  yield takeEvery(CHANGE_LABEL_TO_SHOW, changeLabelToShow)
 }

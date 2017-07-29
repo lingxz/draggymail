@@ -52,6 +52,7 @@ class Board extends React.Component {
     this.partialSyncTick = this.partialSyncTick.bind(this);
     this.fetchAllLabelsTick = this.fetchAllLabelsTick.bind(this);
     this.addLabelToShow = this.addLabelToShow.bind(this);
+    this.requestChangeLabelToShow = this.requestChangeLabelToShow.bind(this);
   }
 
   partialSyncTick() {
@@ -114,6 +115,10 @@ class Board extends React.Component {
     this.props.requestFetchAllLabels();
   }
 
+  requestChangeLabelToShow(position, oldLabelId, newLabelId) {
+    this.props.requestChangeLabelToShow(position, oldLabelId, newLabelId);
+  }
+
   moveCard(lastX, lastY, nextX, nextY) {
     this.props.moveCard(lastX, lastY, nextX, nextY);
   }
@@ -165,6 +170,7 @@ class Board extends React.Component {
             startScrolling={this.startScrolling}
             stopScrolling={this.stopScrolling}
             isScrolling={this.state.isScrolling}
+            requestChangeLabel={this.requestChangeLabelToShow}
             allLabels={allLabels}
             x={i}
           />

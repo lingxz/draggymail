@@ -5,6 +5,7 @@ import {
   watchPartialSyncMailBox,
   watchFetchAllLabels,
   watchAddLabelToShow,
+  watchChangeLabel,
 } from './mailbox';
 
 export default function* rootSaga(context) {
@@ -14,5 +15,6 @@ export default function* rootSaga(context) {
     watchPartialSyncMailBox(),
     watchFetchAllLabels(),
     watchAddLabelToShow(context),
+    watchChangeLabel(),
   ])
 }

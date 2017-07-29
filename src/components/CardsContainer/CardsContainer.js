@@ -74,8 +74,18 @@ class CardsContainer extends React.Component {
     stopScrolling: PropTypes.func,
     isScrolling: PropTypes.bool,
     allLabels: PropTypes.array,
+    requestChangeLabel: PropTypes.func.isRequired,
+  }
+  constructor(props) {
+    super(props);
+    this.onLabelChange = this.onLabelChange.bind(this);
   }
 
+  onLabelChange(newLabel) {
+    console.log(newLabel);
+    const { x, item, requestChangeLabel } = this.props;
+    requestChangeLabel(x, item.id, newLabel.value);
+  }
 
 	render() {
     const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging, allLabels } = this.props;
@@ -89,22 +99,20 @@ class CardsContainer extends React.Component {
         label: allLabels[i].name
       })
     }
-    console.log(options);
-    function logChange(val) {
-      console.log("Selected: " + JSON.stringify(val));
-    }
 
 	  return connectDragSource(connectDropTarget(
       <div className={s.root}>
         <div className={s.head}>
           <div className={s.name}>
-            <Select
-              name="label"
-              clearable={false}
-              value={item.id}
-              options={options}
-              onChange={logChange}
-            />
+            <div className={s.selectWrapper}>
+              <Select
+                name="label"
+                clearable={false}
+                value={item.id}
+                options={options}
+                onChange={this.onLabelChange}
+              />
+            </div>
           </div>
         </div>
         <div className={s.items}>
@@ -113,7 +121,7 @@ class CardsContainer extends React.Component {
             moveCard={moveCard}
             item={item}
             x={x}
-            cards={threads}
+            cards={threads || []}
             latestUnreadThreads={item.latestUnreadThreads}
             startScrolling={this.props.startScrolling}
             stopScrolling={this.props.stopScrolling}

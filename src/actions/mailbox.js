@@ -16,6 +16,7 @@ import {
   PARTIAL_SYNC_MAILBOX_REQUEST,
   ADD_LABEL_TO_SHOW,
   UPDATE_LABELS_TO_SHOW,
+  CHANGE_LABEL_TO_SHOW,
 } from '../constants';
 
 export function moveList(lastX, nextX) {
@@ -182,39 +183,37 @@ export function fetchAllLabels(user) {
   return GmailActions.fetchAllLabels(user)
 }
 
-// export function fetchAllLabelsAction(user) {
-//   return async (dispatch) => {
-//     if (authNeedsRefresh(user)) {
-//       user = await refreshAuth(user);
-//       dispatch({ type: UPDATE_USER_CREDENTIALS, user })
-//     }
-//     dispatch({ type: GET_ALL_MAILBOX_LABELS_START })
-//     return GmailActions.fetchAllLabels(user)
-//       .then(data => dispatch({ type: GET_ALL_MAILBOX_LABELS_SUCCESS, labels: data.labels }))
-//       .catch(err => dispatch({ type: GET_ALL_MAILBOX_LABELS_FAILURE, err }))
-//   }
-// }
-
-export function fullSyncMailBoxLabel(user, label) {
+export function fullSyncMailBoxLabel(user, labelId) {
   const params = {
-    labelIds: label.id
+    labelIds: labelId,
   }
 
   const queryString = getQueryString(params);
   return GmailActions.fetchThreadIds(user, "?" + queryString)
     .then(data => {
       let threadIds = [];
-      for (var i = 0; i < data.threads.length; i++) {
-        messageIds.push(data.threads[i].id)
+      let threads = data.threads || [];
+      for (var i = 0; i < threads.length; i++) {
+        threadIds.push(threads[i].id)
       }
       return threadIds;
     })
-    .then(threadIds => GmailActions.fetchManyThreads(user, threadIds))
-    .then(threads => processThreads(threads))
+    .then(threadIds => {
+      return GmailActions.fetchManyThreads(user, threadIds)
+    })
+    .then(threads => {
+      return processThreads(threads)
+    })
 }
 
+// just a wrapper for the gmail fetch
 export function fetchMultipleLabelInfo(user, labelIds) {
   return GmailActions.fetchMultipleLabelInfo(user, labelIds)
+}
+
+// just a wrapper for the gmail fetch
+export function fetchLabelInfo(user, labelId) {
+  return GmailActions.fetchLabelInfo(user, labelId)
 }
 
 
@@ -274,6 +273,14 @@ export function addLabelToShow() {
 export function requestPartialSyncMailBox() {
   return ({ type: PARTIAL_SYNC_MAILBOX_REQUEST })
 }
+
+export function requestChangeLabelToShow(position, oldLabelId, newLabelId) {
+  if (oldLabelId !== newLabelId) {
+    console.log(position);
+    return({ type: CHANGE_LABEL_TO_SHOW, position: position, newLabelId: newLabelId })
+  }
+}
+
 
 export function partialSyncMailBox(user, labels, mailbox) {
   // TODO: need to retrieve according to next page token

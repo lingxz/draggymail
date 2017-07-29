@@ -37,3 +37,7 @@
 	height: 161px;
 	background-color: rgba(208,208,208,1);
 }
+
+.selectWrapper {
+  padding-right: 10px;
+}

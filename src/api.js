@@ -34,4 +34,16 @@ router.post('/add-label', (req, res) => {
     })
 })
 
+router.post('/change-label', (req, res) => {
+  Label.update({ labelId: req.body.newLabelId }, {
+    where: { position: req.body.position, userId: req.user.id },
+    returning: true,
+    plain: true,
+  })
+    .then((label) => {
+      console.log(label);
+      return res.sendStatus(200);
+    })
+})
+
 export default router;
