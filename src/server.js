@@ -32,6 +32,7 @@ import schema from './data/schema';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { login } from './actions/user';
+import { updateLabelsToShow } from './actions/mailbox';
 import config from './config';
 
 const app = express();
@@ -146,12 +147,8 @@ app.get('*', async (req, res, next) => {
 
     if (req.user) {
       store.dispatch(login(req.user))
+      store.dispatch(updateLabelsToShow(req.user.labels))
     }
-
-    // store.dispatch(setRuntimeVariable({
-    //   name: 'initialNow',
-    //   value: Date.now(),
-    // }));
 
     // Global (context) variables that can be easily accessed from any React component
     // https://facebook.github.io/react/docs/context.html

@@ -15,7 +15,7 @@
 
 import passport from 'passport';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
-import { User, UserLogin, UserClaim, UserProfile, Board, Label } from './data/models';
+import { User, UserLogin, UserClaim, UserProfile, Label } from './data/models';
 import config from './config';
 
 /**
@@ -109,18 +109,15 @@ passport.use(new GoogleStrategy({
             gender: profile._json.gender,
             picture: profile._json.image.url,
           },
-          boards: [
-            {
-              name: 'default',
-              labels: [{ labelId: 'INBOX', position: 0 }],
-            }
-          ]
+          labels: [
+            { labelId: 'INBOX', position: 0 }
+          ],
         }, {
           include: [
             { model: UserLogin, as: 'logins' },
             { model: UserClaim, as: 'claims' },
             { model: UserProfile, as: 'profile' },
-            { model: Board, as: 'boards', include: [{ model: Label, as: 'labels' }] },
+            { model: Label, as: 'labels' },
           ],
         });
         console.log("here's the user")
@@ -141,10 +138,36 @@ passport.use(new GoogleStrategy({
 
 passport.serializeUser(function(user, done) {
   console.log('serializing user: ');
-  done(null, user)
+  done(null, { id: user.id, expiryTime: user.expiryTime, accessToken: user.accessToken })
+  // done(null, user)
 });
 
 passport.deserializeUser(function(user, done) {
-  done(null, user);
+  const id = user.id;
+  const expiryTime = user.expiryTime;
+  const accessToken = user.accessToken;
+
+  User.find({
+    attributes: ['id', 'email', 'refreshToken'],
+    where: { id: id },
+    include: ['labels'],
+  })
+    .then(currentUser => {
+      const labelsArray = currentUser.labels.map(lbl=> {
+        return { id: lbl.labelId, position: lbl.position }
+      });
+      labelsArray.sort((a, b) => {
+        return a.position - b.position
+      });
+      const userToReturn = {
+        id: currentUser.id,
+        email: currentUser.email,
+        expiryTime: expiryTime,
+        accessToken: accessToken,
+        refreshToken: currentUser.refreshToken,
+        labels: labelsArray.map(lab => lab.id),
+      };
+      return done(null, userToReturn)
+    })
 });
 export default passport;

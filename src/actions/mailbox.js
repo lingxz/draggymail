@@ -15,6 +15,7 @@ import {
   UPDATE_USER_CREDENTIALS,
   PARTIAL_SYNC_MAILBOX_REQUEST,
   ADD_LABEL_LANE,
+  UPDATE_LABELS_TO_SHOW,
 } from '../constants';
 
 export function moveList(lastX, nextX) {
@@ -155,6 +156,9 @@ function sortAndProcessMessages(messages, labelIds) {
   return { messagesTrashed, messagesChanged, messagesRemovedFromLabels, messagesDeleted }
 }
 
+export function updateLabelsToShow(labels) {
+  return { type: UPDATE_LABELS_TO_SHOW, labels }
+}
 
 export function refreshAuth(user, fetch) {
   return GmailActions.refreshToken(user, fetch)

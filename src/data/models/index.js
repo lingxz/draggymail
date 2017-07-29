@@ -13,7 +13,6 @@ import UserLogin from './UserLogin';
 import UserClaim from './UserClaim';
 import UserProfile from './UserProfile';
 import Label from './Label';
-import Board from './Board';
 
 User.hasMany(UserLogin, {
   foreignKey: 'userId',
@@ -36,23 +35,17 @@ User.hasOne(UserProfile, {
   onDelete: 'cascade',
 });
 
-User.hasMany(Board, {
+User.hasMany(Label, {
   foreignKey: 'userId',
-  as: 'boards',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
-})
-
-Board.hasMany(Label, {
-  foreigKey: 'boardId',
   as: 'labels',
   onUpdate: 'cascade',
   onDelete: 'cascade',
-})
+});
+
 
 function sync(...args) {
   return sequelize.sync(...args);
 }
 
 export default { sync };
-export { User, UserLogin, UserClaim, UserProfile, Board, Label };
+export { User, UserLogin, UserClaim, UserProfile, Label };
