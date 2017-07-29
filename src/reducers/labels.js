@@ -2,7 +2,7 @@ import { Record, List, fromJS } from 'immutable';
 
 import {
   MOVE_CARD,
-  MOVE_LIST,
+  MOVE_LABEL,
   TOGGLE_DRAGGING,
   UPDATE_HISTORY_ID,
   LIST_ALL_LABELS_REQUEST,
@@ -57,7 +57,7 @@ export default function labels(state = initialState, action) {
         return state;
       }
     }
-    case MOVE_LIST: {
+    case MOVE_LABEL: {
       const newLabelsToShow = [...state.toJS().labelsToShow];
       const { lastX, nextX } = action;
       const t = newLabelsToShow.splice(lastX, 1)[0];

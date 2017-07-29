@@ -10,7 +10,7 @@ import {
   GET_MAILBOX_LABEL_INFO_FAILURE,
   LIST_ALL_LABELS_REQUEST,
   MOVE_CARD,
-  MOVE_LIST,
+  MOVE_LABEL,
   TOGGLE_DRAGGING,
   UPDATE_USER_CREDENTIALS,
   PARTIAL_SYNC_MAILBOX_REQUEST,
@@ -22,8 +22,8 @@ import {
   REMOVE_LABEL_TO_SHOW_FAILURE,
 } from '../constants';
 
-export function moveList(lastX, nextX) {
-  return { type: MOVE_LIST, lastX, nextX }
+export function moveLabel(lastX, nextX) {
+  return { type: MOVE_LABEL, lastX, nextX }
 }
 
 export function moveCard(lastLabelId, nextLabelId, lastY) {

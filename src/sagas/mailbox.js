@@ -20,6 +20,7 @@ import {
   REMOVE_LABEL_TO_SHOW,
   REMOVE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW_FAILURE,
+  MOVE_LABEL,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -174,6 +175,23 @@ export function* changeLabelToShow(action) {
   }
 }
 
+export function* moveLabelToShow(action) {
+  try {
+    const opts = {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ oldPos: action.lastX, newPos: action.nextX })
+    };
+    yield call(fetch, '/api/move-label', opts);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export function* watchAddLabelToShow({ fetch }) {
   yield takeEvery(ADD_LABEL_TO_SHOW, addLabelToShow, fetch)
 }
@@ -184,4 +202,8 @@ export function* watchChangeLabel() {
 
 export function* watchRemoveLabel() {
   yield takeLatest(REMOVE_LABEL_TO_SHOW, removeLabelToShow)
+}
+
+export function* watchMoveLabel() {
+  yield takeLatest(MOVE_LABEL, moveLabelToShow)
 }

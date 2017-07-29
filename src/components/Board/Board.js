@@ -40,8 +40,7 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.moveCard = this.moveCard.bind(this);
-    this.moveList = this.moveList.bind(this);
-    this.findList = this.findList.bind(this);
+    this.moveLabel = this.moveLabel.bind(this);
     this.requestPartialSyncMailBox = this.requestPartialSyncMailBox.bind(this);
     this.requestFetchAllLabels = this.requestFetchAllLabels.bind(this);
     this.scrollRight = this.scrollRight.bind(this);
@@ -65,13 +64,13 @@ class Board extends React.Component {
   }
 
   componentDidMount() {
-    this.partialSyncInterval = setInterval(this.partialSyncTick, 30*1000);
+    // this.partialSyncInterval = setInterval(this.partialSyncTick, 30*1000);
     // this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
     this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
   }
 
   componentWillUnmount() {
-    clearInterval(this.partialSyncInterval)
+    // clearInterval(this.partialSyncInterval)
     clearInterval(this.fetchAllLabelsInterval)
   }
 
@@ -128,22 +127,16 @@ class Board extends React.Component {
     this.props.moveCard(lastX, lastY, nextX, nextY);
   }
 
-  moveList(listId, nextX) {
-    const { lastX } = this.findList(listId);
+  moveLabel(lastX, nextX) {
+    this.props.moveLabel(lastX, nextX);
+  }
+
+  moveList(lastX, nextX) {
     this.props.moveList(lastX, nextX);
   }
 
   addLabelToShow() {
     this.props.addLabelToShow();
-  }
-
-  findList(id) {
-    const { mailbox, labelsToShow } = this.props;
-
-    return {
-      lists: mailbox[id].emails,
-      lastX: labelsToShow.indexOf(id)
-    };
   }
 
   render() {
@@ -171,7 +164,7 @@ class Board extends React.Component {
             labelId={mailbox[item].id}
             item={mailbox[item]}
             moveCard={this.moveCard}
-            moveList={this.moveList}
+            moveLabel={this.moveLabel}
             startScrolling={this.startScrolling}
             stopScrolling={this.stopScrolling}
             isScrolling={this.state.isScrolling}

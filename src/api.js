@@ -46,6 +46,54 @@ router.post('/change-label', (req, res) => {
     })
 })
 
+router.post('/move-label', (req, res) => {
+  console.log("requested positions");
+  console.log(req.body.oldPos, req.body.newPos)
+  if (req.body.oldPos > req.body.newPos) {
+    let currentLabel = null;
+    sequelize.transaction(t => {
+      return Label.findOne({ where: { position: req.body.oldPos, userId: req.user.id }})
+        .then(label => {
+          currentLabel = label;
+          return Label.update({ position: sequelize.literal("position +1") }, {
+            where: {
+              position: { $gte: req.body.newPos, $lt: req.body.oldPos },
+              userId: req.user.id,
+            },
+            transaction: t,
+          })
+        })
+        .then(() => {
+          return currentLabel.update({ position: req.body.newPos }, { transaction: t })
+        })
+        .then(() => {
+          res.sendStatus(200);
+        })
+    })
+  } else {
+    sequelize.transaction(t => {
+      let currentLabel = null;
+      return Label.findOne({ where: { position: req.body.oldPos, userId: req.user.id }})
+        .then(label => {
+          currentLabel = label;
+          return Label.update({ position: sequelize.literal("position -1") }, {
+            where: {
+              position: { $gt: req.body.oldPos, $lte: req.body.newPos },
+              userId: req.user.id,
+            },
+            transaction: t,
+          })
+        })
+        .then(() => {
+          return currentLabel.update({ position: req.body.newPos }, { transaction: t })
+        })
+        .then(() => {
+          res.sendStatus(200);
+        })
+    })
+  }
+})
+
 router.post('/remove-label', (req, res) => {
   sequelize.transaction(t => {
     return Label.destroy({

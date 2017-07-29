@@ -10,18 +10,24 @@ import rs from 'react-select/dist/react-select.css';
 const listSource = {
   beginDrag(props) {
     return {
-      id: props.id,
+      id: props.labelId,
       x: props.x,
     };
   },
-  endDrag(props) {
-    props.stopScrolling();
-  }
 };
 
 const listTarget = {
-  canDrop() {
-    return false;
+  // canDrop() {
+  //   return false;
+  // },
+  drop(props, monitor, component) {
+    // document.getElementById(monitor.getItem().id).style.display = 'block';
+
+    const { x: lastX } = monitor.getItem();
+    const { x: nextX } = props;
+    if (lastX !== nextX) {
+      props.moveLabel(lastX, nextX);
+    }
   },
   hover(props, monitor) {
     if (!props.isScrolling) {
@@ -37,11 +43,11 @@ const listTarget = {
         props.stopScrolling();
       }
     }
-    const { id: listId } = monitor.getItem();
-    const { id: nextX } = props;
-    if (listId !== nextX) {
-      props.moveList(listId, props.x);
-    }
+    const { x: lastX } = monitor.getItem();
+    const { x: nextX } = props;
+    // if (lastX !== nextX) {
+    //   props.moveLabel(lastX, nextX);
+    // }
   }
 };
 
@@ -68,7 +74,7 @@ class CardsContainer extends React.Component {
     labelId: PropTypes.string.isRequired,
     x: PropTypes.number,
     moveCard: PropTypes.func.isRequired,
-    moveList: PropTypes.func.isRequired,
+    moveLabel: PropTypes.func.isRequired,
     isDragging: PropTypes.bool,
     startScrolling: PropTypes.func,
     stopScrolling: PropTypes.func,
