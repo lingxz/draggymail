@@ -17,6 +17,9 @@ import {
   CHANGE_LABEL_TO_SHOW_DB_SUCCESS,
   CHANGE_LABEL_TO_SHOW_DB_FAILURE,
   CHANGE_LABEL_TO_SHOW_SUCCESS,
+  REMOVE_LABEL_TO_SHOW,
+  REMOVE_LABEL_TO_SHOW_SUCCESS,
+  REMOVE_LABEL_TO_SHOW_FAILURE,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -110,6 +113,30 @@ export function* addLabelToShow() {
   }
 }
 
+export function* removeLabelToShow(action) {
+  try {
+    const opts = {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ position: action.position })
+    }
+    const res = yield call(fetch, '/api/remove-label', opts);
+    if (res.status === 200) {
+      yield put({ type: REMOVE_LABEL_TO_SHOW_SUCCESS, position: action.position })
+    } else {
+      console.log(res.statusText);
+      yield put({ type: REMOVE_LABEL_TO_SHOW_FAILURE })
+    }
+  } catch(err) {
+    console.log(err);
+    yield put({ type: REMOVE_LABEL_TO_SHOW_FAILURE })
+  }
+}
+
 export function* changeLabelToShow(action) {
   try {
     const user = yield select(getUser);
@@ -133,7 +160,8 @@ export function* changeLabelToShow(action) {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify({ position: action.position, newLabelId: action.newLabelId }) }
+      body: JSON.stringify({ position: action.position, newLabelId: action.newLabelId })
+    };
     const res = yield call(fetch, '/api/change-label', opts);
     if (res.status === 200) {
       // only update labelsToShow in store when all the data is loaded to prevent flickering
@@ -152,4 +180,8 @@ export function* watchAddLabelToShow({ fetch }) {
 
 export function* watchChangeLabel() {
   yield takeEvery(CHANGE_LABEL_TO_SHOW, changeLabelToShow)
+}
+
+export function* watchRemoveLabel() {
+  yield takeLatest(REMOVE_LABEL_TO_SHOW, removeLabelToShow)
 }

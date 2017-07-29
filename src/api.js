@@ -46,7 +46,7 @@ router.post('/change-label', (req, res) => {
     })
 })
 
-router.post('/delete-label', (req, res) => {
+router.post('/remove-label', (req, res) => {
   sequelize.transaction(t => {
     return Label.destroy({
       where: { userId: req.user.id, position: req.body.position }

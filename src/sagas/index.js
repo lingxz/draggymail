@@ -6,6 +6,7 @@ import {
   watchFetchAllLabels,
   watchAddLabelToShow,
   watchChangeLabel,
+  watchRemoveLabel,
 } from './mailbox';
 
 export default function* rootSaga(context) {
@@ -16,5 +17,6 @@ export default function* rootSaga(context) {
     watchFetchAllLabels(),
     watchAddLabelToShow(context),
     watchChangeLabel(),
+    watchRemoveLabel(),
   ])
 }

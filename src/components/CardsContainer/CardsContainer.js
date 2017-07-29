@@ -75,16 +75,22 @@ class CardsContainer extends React.Component {
     isScrolling: PropTypes.bool,
     allLabels: PropTypes.array,
     requestChangeLabel: PropTypes.func.isRequired,
+    requestRemoveLabel: PropTypes.func.isRequired,
   }
   constructor(props) {
     super(props);
     this.onLabelChange = this.onLabelChange.bind(this);
+    this.handleCloseClick = this.handleCloseClick.bind(this);
   }
 
   onLabelChange(newLabel) {
-    console.log(newLabel);
     const { x, item, requestChangeLabel } = this.props;
     requestChangeLabel(x, item.id, newLabel.value);
+  }
+
+  handleCloseClick() {
+    const { requestRemoveLabel, x } = this.props;
+    requestRemoveLabel(x);
   }
 
 	render() {
@@ -113,6 +119,7 @@ class CardsContainer extends React.Component {
                 onChange={this.onLabelChange}
               />
             </div>
+            <div className={s.close} onClick={this.handleCloseClick}>x</div>
           </div>
         </div>
         <div className={s.items}>

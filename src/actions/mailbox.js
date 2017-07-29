@@ -17,6 +17,9 @@ import {
   ADD_LABEL_TO_SHOW,
   UPDATE_LABELS_TO_SHOW,
   CHANGE_LABEL_TO_SHOW,
+  REMOVE_LABEL_TO_SHOW,
+  REMOVE_LABEL_TO_SHOW_SUCCESS,
+  REMOVE_LABEL_TO_SHOW_FAILURE,
 } from '../constants';
 
 export function moveList(lastX, nextX) {
@@ -281,6 +284,9 @@ export function requestChangeLabelToShow(position, oldLabelId, newLabelId) {
   }
 }
 
+export function requestRemoveLabelToShow(position) {
+  return ({ type: REMOVE_LABEL_TO_SHOW, position: position })
+}
 
 export function partialSyncMailBox(user, labels, mailbox) {
   // TODO: need to retrieve according to next page token
