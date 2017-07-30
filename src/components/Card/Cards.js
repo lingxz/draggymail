@@ -24,7 +24,7 @@ function getPlaceholderIndex(y, scrollY) {
 const specs = {
   drop(props, monitor, component) {
     document.getElementById(monitor.getItem().id).style.display = 'block';
-    const lastY = monitor.getItem().y;
+    const threadId = monitor.getItem().id;
 
     const lastLabelId = monitor.getItem().labelId;
     const nextLabelId = props.labelId;
@@ -32,7 +32,7 @@ const specs = {
     if (lastLabelId === nextLabelId) { // if no move
       return;
     }
-    props.moveCard(lastLabelId, nextLabelId, lastY);
+    props.moveCard(lastLabelId, nextLabelId, threadId);
   },
   hover(props, monitor, component) {
     // defines where placeholder is rendered

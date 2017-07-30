@@ -21,6 +21,7 @@ import {
   REMOVE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW_FAILURE,
   MOVE_LABEL,
+  MOVE_CARD,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -175,6 +176,18 @@ export function* changeLabelToShow(action) {
   }
 }
 
+export function* moveThread(action) {
+  try {
+    const user = yield select(getUser);
+    // partial sync then move thread, so that history Id is kept up to date
+    yield put({ type: PARTIAL_SYNC_MAILBOX_REQUEST });
+    const data = yield call(MailBoxActions.moveThread, user, action.threadId, action.nextLabelId, action.lastLabelId)
+    console.log(data);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 export function* moveLabelToShow(action) {
   try {
     const opts = {
@@ -206,4 +219,8 @@ export function* watchRemoveLabel() {
 
 export function* watchMoveLabel() {
   yield takeLatest(MOVE_LABEL, moveLabelToShow)
+}
+
+export function* watchMoveThread() {
+  yield takeEvery(MOVE_CARD, moveThread)
 }

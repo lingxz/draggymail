@@ -122,12 +122,21 @@ function checkThreadUnread(thread) {
   return unread;
 }
 
+function findThreadById(threadList, threadId) {
+  for (var i = 0; i < threadList.length; i++) {
+    if (threadList[i].id === threadId) {
+      return { threadToMove: threadList[i], lastY: i }
+    }
+  }
+  return { threadToMove: null, lastY: -1 }
+}
+
 const initialState = new Map();
 
 export default function mailbox(state = initialState, action) {
   switch (action.type) {
     case MOVE_CARD: {
-      const { lastLabelId, nextLabelId, lastY } = action;
+      const { lastLabelId, nextLabelId, threadId } = action;
       if (lastLabelId === nextLabelId) {
         return state;
       } else {
@@ -138,8 +147,8 @@ export default function mailbox(state = initialState, action) {
         const lastLane = lastLabel.threads;
 
         // move element to new place
-        const insertionIndex = getInsertIndexByDate(nextLane, lastLane[lastY].date);
-        const threadToMove = lastLane[lastY];
+        const { threadToMove, lastY } = findThreadById(lastLane, threadId)
+        const insertionIndex = getInsertIndexByDate(nextLane, threadToMove.date);
 
         // remove label from element and add new one
         const threadLabels = threadToMove.labelIds

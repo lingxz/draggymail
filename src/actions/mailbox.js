@@ -26,8 +26,8 @@ export function moveLabel(lastX, nextX) {
   return { type: MOVE_LABEL, lastX, nextX }
 }
 
-export function moveCard(lastLabelId, nextLabelId, lastY) {
-  return { type: MOVE_CARD, lastLabelId, nextLabelId, lastY }
+export function moveCard(lastLabelId, nextLabelId, threadId) {
+  return { type: MOVE_CARD, lastLabelId, nextLabelId, threadId }
 }
 
 export function toggleDragging(isDragging) {
@@ -286,6 +286,10 @@ export function requestChangeLabelToShow(position, oldLabelId, newLabelId) {
 
 export function requestRemoveLabelToShow(position) {
   return ({ type: REMOVE_LABEL_TO_SHOW, position: position })
+}
+
+export function moveThread(user, threadId, labelToAdd, labelToRemove) {
+  return GmailActions.moveThread(user, threadId, labelToAdd, labelToRemove)
 }
 
 export function partialSyncMailBox(user, labels, mailbox) {

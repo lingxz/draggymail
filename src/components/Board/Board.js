@@ -123,8 +123,8 @@ class Board extends React.Component {
     this.props.requestRemoveLabelToShow(position);
   }
 
-  moveCard(lastX, lastY, nextX, nextY) {
-    this.props.moveCard(lastX, lastY, nextX, nextY);
+  moveCard(lastLabelId, nextLabelId, lastY) {
+    this.props.moveCard(lastLabelId, nextLabelId, lastY);
   }
 
   moveLabel(lastX, nextX) {
