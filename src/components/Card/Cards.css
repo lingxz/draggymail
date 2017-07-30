@@ -14,3 +14,8 @@
 	transition: 0.15s;
 	cursor: pointer;
 }
+
+.message {
+  padding: 1em;
+  color: #808080;
+}

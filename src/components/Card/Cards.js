@@ -109,7 +109,7 @@ class Cards extends React.Component {
     // const { placeholderIndex } = this.state;
     return connectDropTarget(
       <div className={s.root}>
-        {cards.map((item, i) =>
+        {cards && cards.map((item, i) =>
           <Card
             labelId={labelId}
             x={x}
@@ -119,6 +119,9 @@ class Cards extends React.Component {
             stopScrolling={this.props.stopScrolling}
           />
         )}
+        { cards.length === 0 &&
+          <div className={s.message}>No emails here</div>
+        }
       </div>
     );
   }
