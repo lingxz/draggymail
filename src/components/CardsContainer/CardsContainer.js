@@ -125,7 +125,7 @@ class CardsContainer extends React.Component {
                 onChange={this.onLabelChange}
               />
             </div>
-            <div className={s.close} onClick={this.handleCloseClick}>x</div>
+            <div className={s.close} onClick={this.handleCloseClick}></div>
           </div>
         </div>
         <div className={s.items}>
