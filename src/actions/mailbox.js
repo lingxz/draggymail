@@ -1,5 +1,6 @@
 import * as GmailActions from './gmail';
 import DataLoader from 'dataloader';
+import base64 from 'base-64';
 import {
   SYNC_MAILBOX_LABEL_REQUEST,
   SYNC_MAILBOX_LABEL_SUCCESS,
@@ -21,6 +22,8 @@ import {
   REMOVE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW_FAILURE,
 } from '../constants';
+
+const b64Decode = base64.decode;
 
 export function moveLabel(lastX, nextX) {
   return { type: MOVE_LABEL, lastX, nextX }
@@ -49,17 +52,6 @@ function getQueryString(params) {
     .join('&')
 }
 
-
-function getFieldFromPayload(headers, field) {
-  for (var i = 0; i < headers.length; i++) {
-    var dict = headers[i];
-    if (dict.name == field) {
-      return dict.value
-    }
-  }
-  return null;
-}
-
 export function sortEmails(emails, labels) {
   var labelsMap = labels.reduce((map, obj) => {
     map[obj] = [];
@@ -78,18 +70,76 @@ export function sortEmails(emails, labels) {
   return labelsMap;
 }
 
+/**
+ * Decodes a url safe Base64 string to its original representation.
+ * @param  {string} string
+ * @return {string}
+ */
+function urlB64Decode(string) {
+  return string
+   ? decodeURIComponent(escape(b64Decode(string.replace(/\-/g, '+').replace(/\_/g, '/'))))
+   : '';
+}
+
+function indexHeaders(headers) {
+  if (!headers) {
+    return {};
+  } else {
+    return headers.reduce(function (result, header) {
+      result[header.name.toLowerCase()] = header.value;
+      return result;
+    }, {});
+  }
+}
+
+// taken from https://github.com/emiltholin/gmail-api-parse-message
+
 export function formatEmail(email) {
-  return {
+  const result = {
     id: email.id,
-    subject: getFieldFromPayload(email.payload.headers, 'Subject'),
-    from: getFieldFromPayload(email.payload.headers, 'From'),
-    to: getFieldFromPayload(email.payload.headers, 'To'),
-    content: email.snippet,
     snippet: email.snippet,
     threadId: email.threadId,
     labelIds: email.labelIds,
     date: email.internalDate,
+  };
+
+  let headers = indexHeaders(email.payload.headers);
+  result.headers = headers;
+
+  let parts = [email.payload];
+  let firstPartProcessed = false;
+  while (parts.length !== 0) {
+    let part = parts.shift();
+    if (part.parts) {
+      parts = parts.concat(part.parts);
+    }
+    if (firstPartProcessed) {
+      headers = indexHeaders(part.headers);
+    }
+
+    var isHtml = part.mimeType && part.mimeType.indexOf('text/html') !== -1;
+    var isPlain = part.mimeType && part.mimeType.indexOf('text/plain') !== -1;
+    var isAttachment = headers['content-disposition'] && headers['content-disposition'].indexOf('attachment') !== -1;
+
+    if (isHtml && !isAttachment) {
+      result.textHtml = urlB64Decode(part.body.data);
+    } else if (isPlain && !isAttachment) {
+      result.textPlain = urlB64Decode(part.body.data);
+    } else if (isAttachment) {
+      var body = part.body;
+      if(!result.attachments) {
+        result.attachments = [];
+      }
+      result.attachments.push({
+        filename: part.filename,
+        mimeType: part.mimeType,
+        size: body.size,
+        attachmentId: body.attachmentId
+      });
+    }
+    firstPartProcessed = true;
   }
+  return result;
 }
 
 function processEmails(emails) {
@@ -115,11 +165,10 @@ function formatThread(thread) {
     id: thread.id,
     historyId: thread.historyId,
     date: latestEmail.date,
-    to: latestEmail.to,
-    from: latestEmail.from,
+    to: latestEmail.headers.to,
+    from: latestEmail.headers.from,
     snippet: latestEmail.snippet,
-    content: latestEmail.content,
-    subject: latestEmail.subject,
+    subject: latestEmail.headers.subject,
     labelIds: latestEmail.labelIds,
     emails: emails,
     unread: unread,
