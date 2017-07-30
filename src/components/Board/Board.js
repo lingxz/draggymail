@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import ReactModal from 'react-modal';
 import s from './Board.css';
 import CardsContainer from '../CardsContainer';
 import PlaceholdCardsContainer from '../PlaceholdCardsContainer';
@@ -53,6 +54,11 @@ class Board extends React.Component {
     this.addLabelToShow = this.addLabelToShow.bind(this);
     this.requestChangeLabelToShow = this.requestChangeLabelToShow.bind(this);
     this.requestRemoveLabelToShow = this.requestRemoveLabelToShow.bind(this);
+    this.triggerEmailModal = this.triggerEmailModal.bind(this);
+  }
+
+  triggerEmailModal(item) {
+    this.props.triggerEmailModal(item);
   }
 
   partialSyncTick() {
@@ -171,6 +177,7 @@ class Board extends React.Component {
             requestChangeLabel={this.requestChangeLabelToShow}
             requestRemoveLabel={this.requestRemoveLabelToShow}
             allLabels={allLabels}
+            triggerEmailModal={this.triggerEmailModal}
             x={i}
           />
         )}

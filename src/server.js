@@ -18,7 +18,6 @@ import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
 import session from 'express-session'
 import fetch from 'isomorphic-fetch';
-import google from 'googleapis';
 
 import App from './components/App';
 import Html from './components/Html';

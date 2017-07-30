@@ -6,13 +6,25 @@ import s from './Card.css';
 class Card extends React.Component {
 	static propTypes = {
 		item: PropTypes.object.isRequired,
-		style: PropTypes.object
+		style: PropTypes.object,
+    triggerEmailModal: PropTypes.func,
 	}
+
+  constructor(props) {
+    super(props);
+    this._handleDoubleClick = this._handleDoubleClick.bind(this);
+  }
+
+  _handleDoubleClick() {
+    const { item, triggerEmailModal } = this.props;
+    triggerEmailModal(item);
+  }
+
 	render() {
 		const { style, item } = this.props;
 
 		return (
-	    <div style={style} className={item.unread ? s.unread: s.root} id={style ? item.id : null}>
+	    <div onDoubleClick={this._handleDoubleClick} style={style} className={item.unread ? s.unread: s.root} id={style ? item.id : null}>
 	      <div className={s.name}>{item.from}</div>
 	      <div className={s.container}>
 	        <div className={s.content}>

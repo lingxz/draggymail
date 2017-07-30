@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { DropTarget, DragSource } from 'react-dnd';
 import Select from 'react-select';
+import rs from 'react-select/dist/react-select.css';
 import s from './CardsContainer.css';
 import Cards from '../Card';
-import rs from 'react-select/dist/react-select.css';
 
 const listSource = {
   beginDrag(props) {
@@ -82,6 +82,7 @@ class CardsContainer extends React.Component {
     allLabels: PropTypes.array,
     requestChangeLabel: PropTypes.func.isRequired,
     requestRemoveLabel: PropTypes.func.isRequired,
+    triggerEmailModal: PropTypes.func,
   }
   constructor(props) {
     super(props);
@@ -139,6 +140,7 @@ class CardsContainer extends React.Component {
             startScrolling={this.props.startScrolling}
             stopScrolling={this.props.stopScrolling}
             isScrolling={this.props.isScrolling}
+            triggerEmailModal={this.props.triggerEmailModal}
           />
         </div>
       </div>

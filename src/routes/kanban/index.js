@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '../../components/KanbanLayout';
 import Board from '../../components/Board';
+import Modal from '../../components/Modal';
 import * as MailBoxActions from '../../actions/mailbox';
 import { FULL_SYNC_MAILBOX_REQUEST, LIST_ALL_LABELS_REQUEST } from '../../constants';
 
@@ -24,7 +25,7 @@ function action({ store, fetch, req }) {
   return {
     chunks: ['kanban'],
     title: 'Emails',
-    component: <Layout><Board /></Layout>,
+    component: <Layout><Board /><Modal /></Layout>,
   };
 }
 

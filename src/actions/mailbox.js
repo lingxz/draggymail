@@ -21,6 +21,7 @@ import {
   REMOVE_LABEL_TO_SHOW,
   REMOVE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW_FAILURE,
+  OPEN_EMAIL_MODAL,
 } from '../constants';
 
 const b64Decode = base64.decode;
@@ -378,3 +379,6 @@ export function partialSyncMailBox(user, labels, mailbox) {
     })
 }
 
+export function triggerEmailModal(item) {
+  return({ type: OPEN_EMAIL_MODAL, item })
+}

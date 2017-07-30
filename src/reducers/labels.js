@@ -39,8 +39,12 @@ export default function labels(state = initialState, action) {
     case UPDATE_LABELS_TO_SHOW:
       return state.set('labelsToShow', fromJS(action.labels))
     case ADD_LABEL_TO_SHOW: {
-      const newLabelsToShow = state.toJS().labelsToShow
-      newLabelsToShow.push(newLabelsToShow[0] || 'INBOX');
+      const newLabelsToShow = state.toJS().labelsToShow;
+      if (newLabelsToShow.length !== 0) {
+        newLabelsToShow.push(newLabelsToShow[0])
+      } else {
+        newLabelsToShow.push('INBOX')
+      }
       return state.set('labelsToShow', fromJS(newLabelsToShow))
     }
     case LIST_ALL_LABELS_REQUEST:
