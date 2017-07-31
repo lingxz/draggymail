@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import * as ModalActions from '../../actions/modal';
 import s from './Modal.css';
+import Thread from '../Thread';
 
 function mapStateToProps(state) {
   const jsState = state.toJS();
@@ -39,14 +40,26 @@ class Modal extends React.Component {
   render() {
     const { isOpen, showing, item } = this.props;
 
+    const style = {
+      content: {
+        'maxWidth': '600px',
+        'margin': '0 auto',
+        'padding': '0',
+      }
+    };
+
     return (
-        <ReactModal
-           isOpen={isOpen}
-           contentLabel="Minimal Modal Example"
-           shouldCloseOnOverlayClick={true}
-        >
-          <button onClick={this.closeEmailModal}>Close Modal</button>
-        </ReactModal>
+      <ReactModal
+         isOpen={isOpen}
+         contentLabel="Minimal Modal Example"
+         shouldCloseOnOverlayClick={true}
+         style={style}
+      >
+        <Thread
+          thread={item}
+          closeEmailModal={this.closeEmailModal}
+        />
+      </ReactModal>
       )
   }
 }

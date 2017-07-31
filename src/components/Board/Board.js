@@ -70,13 +70,13 @@ class Board extends React.Component {
   }
 
   componentDidMount() {
-    // this.partialSyncInterval = setInterval(this.partialSyncTick, 30*1000);
+    this.partialSyncInterval = setInterval(this.partialSyncTick, 30*1000);
     // this.interval = setInterval(this.tick, GMAIL_UNREAD_SYNC_MS);
     this.fetchAllLabelsInterval = setInterval(this.fetchAllLabelsTick, FETCH_ALL_MAILBOX_LABELS)
   }
 
   componentWillUnmount() {
-    // clearInterval(this.partialSyncInterval)
+    clearInterval(this.partialSyncInterval)
     clearInterval(this.fetchAllLabelsInterval)
   }
 

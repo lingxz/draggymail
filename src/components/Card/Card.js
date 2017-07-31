@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Card.css';
+import { parseEmailHeader } from '../../utils';
 
 class Card extends React.Component {
 	static propTypes = {
@@ -25,7 +26,7 @@ class Card extends React.Component {
 
 		return (
 	    <div onDoubleClick={this._handleDoubleClick} style={style} className={item.unread ? s.unread: s.root} id={style ? item.id : null}>
-	      <div className={s.name}>{item.from}</div>
+	      <div className={s.name}>{parseEmailHeader(item.from).name || parseEmailHeader(item.from).email}</div>
 	      <div className={s.container}>
 	        <div className={s.content}>
 	          <div className={s.author}>{item.subject}</div>

@@ -1,0 +1,37 @@
+.head {
+  padding: 1em;
+  border-bottom: 1px solid #e3e3e3;
+  font-size: 1.2em;
+}
+.subject {
+  font-weight: bold;
+  white-space: normal;
+  width: 100%;
+}
+
+.close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.3;
+  cursor: pointer;
+}
+.close:hover {
+  opacity: 1;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
+}
