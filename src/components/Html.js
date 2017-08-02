@@ -44,6 +44,7 @@ class Html extends React.Component {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {scripts.map(script => <link key={script} rel="preload" href={script} as="script" />)}
           <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
           {styles.map(style => (
             <style
               key={style.id}

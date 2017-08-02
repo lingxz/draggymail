@@ -22,7 +22,9 @@ import {
   REMOVE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW_FAILURE,
   OPEN_EMAIL_MODAL,
-  REQUEST_MARK_AS_READ,
+  MARK_AS_READ_REQUEST,
+  ARCHIVE_THREAD_REQUEST,
+  TRASH_THREAD_REQUEST,
 } from '../constants';
 
 const b64Decode = base64.decode;
@@ -339,16 +341,38 @@ export function requestRemoveLabelToShow(position) {
   return ({ type: REMOVE_LABEL_TO_SHOW, position: position })
 }
 
-export function requestMarkAsRead(threadId) {
-  return ({ type: REQUEST_MARK_AS_READ, threadId: threadId })
-}
-
 export function moveThread(user, threadId, labelToAdd, labelToRemove) {
-  return GmailActions.moveThread(user, threadId, labelToAdd, labelToRemove)
+  const labelsToAdd = [labelToAdd];
+  const labelsToRemove = [labelToRemove];
+  return GmailActions.changeLabels(user, threadId, labelsToAdd, labelsToRemove)
 }
 
 export function markAsRead(user, threadId) {
-  return GmailActions.markAsRead(user, threadId)
+  const labelsToAdd = [];
+  const labelsToRemove = ['UNREAD'];
+  return GmailActions.changeLabels(user, threadId, labelsToAdd, labelsToRemove)
+}
+
+export function archiveThread(user, threadId, currentThreadId) {
+  const labelsToAdd = [];
+  const labelsToRemove = ['INBOX', currentThreadId];
+  return GmailActions.changeLabels(user, threadId, labelsToAdd, labelsToRemove)
+}
+
+export function trashThread(user, threadId) {
+  return GmailActions.trashThread(user, threadId)
+}
+
+export function requestMarkAsRead(threadId) {
+  return ({ type: MARK_AS_READ_REQUEST, threadId: threadId })
+}
+
+export function requestArchiveThread(threadId, currentThreadId) {
+  return ({ type: ARCHIVE_THREAD_REQUEST, threadId: threadId, currentThreadId: currentThreadId })
+}
+
+export function requestTrashThread(threadId) {
+  return ({ type: TRASH_THREAD_REQUEST, threadId: threadId })
 }
 
 export function partialSyncMailBox(user, labels, mailbox) {
@@ -388,6 +412,6 @@ export function partialSyncMailBox(user, labels, mailbox) {
     })
 }
 
-export function triggerEmailModal(item) {
-  return({ type: OPEN_EMAIL_MODAL, item })
+export function triggerEmailModal(item, labelId) {
+  return({ type: OPEN_EMAIL_MODAL, item, labelId })
 }

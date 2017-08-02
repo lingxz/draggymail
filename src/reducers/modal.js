@@ -17,6 +17,7 @@ export default function user(state = initialState, action) {
         ctx.set('isOpen', true);
         ctx.set('showing', 'email');
         ctx.set('item', fromJS(action.item));
+        ctx.set('labelId', action.labelId)
       })
     }
     case CLOSE_EMAIL_MODAL: {

@@ -7,6 +7,7 @@ import { parseEmailHeader } from '../../utils';
 class Card extends React.Component {
 	static propTypes = {
 		item: PropTypes.object.isRequired,
+    labelId: PropTypes.string.isRequired,
 		style: PropTypes.object,
     triggerEmailModal: PropTypes.func,
     markAsRead: PropTypes.func,
@@ -18,9 +19,9 @@ class Card extends React.Component {
   }
 
   _handleDoubleClick() {
-    const { item, triggerEmailModal, markAsRead } = this.props;
+    const { item, triggerEmailModal, markAsRead, labelId } = this.props;
     markAsRead(item.id);
-    triggerEmailModal(item);
+    triggerEmailModal(item, labelId);
   }
 
 	render() {

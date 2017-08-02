@@ -147,7 +147,7 @@ export function fetchManyMessages(user, messageIds) {
 // Modify Emails and messages
 /* **************************************************************************/
 
-export function markAsRead(user, threadId) {
+export function changeLabels(user, threadId, labelsToAdd, labelsToRemove) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/threads/" + threadId + "/modify";
   return fetch(url, {
     method: 'POST',
@@ -157,26 +157,22 @@ export function markAsRead(user, threadId) {
       "Accept": 'application/json',
     },
     body: JSON.stringify({
-      addLabelIds: [],
-      removeLabelIds: ['UNREAD'],
+      addLabelIds: labelsToAdd,
+      removeLabelIds: labelsToRemove,
     })
   })
     .then(response => response.json())
 }
 
-export function moveThread(user, threadId, labelToAdd, labelToRemove) {
-  const url = "https://www.googleapis.com/gmail/v1/users/me/threads/" + threadId + "/modify";
+export function trashThread(user, threadId) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/messages/" + threadId + "/trash";
   return fetch(url, {
     method: 'POST',
     headers: {
       "Authorization": "Bearer " + user.accessToken,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      "Content-Type": 'application/json',
+      "Accept": 'application/json',
     },
-    body: JSON.stringify({
-      addLabelIds: [labelToAdd],
-      removeLabelIds: [labelToRemove],
-    })
   })
     .then(response => response.json())
 }

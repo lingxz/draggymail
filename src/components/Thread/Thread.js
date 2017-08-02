@@ -8,16 +8,43 @@ class Thread extends React.Component {
   static propTypes = {
     thread: PropTypes.object.isRequired,
     closeEmailModal: PropTypes.func,
+    archiveThread: PropTypes.func,
+    trashThread: PropTypes.func,
+  }
+
+  constructor(props) {
+    super(props);
+    this.handleArchiveThread = this.handleArchiveThread.bind(this);
+    this.handleTrashThread = this.handleTrashThread.bind(this);
+  }
+
+  handleArchiveThread() {
+    const { thread, archiveThread, labelId, closeEmailModal } = this.props;
+    archiveThread(thread.id, labelId)
+    closeEmailModal();
+  }
+
+  handleTrashThread() {
+    const { thread, trashThread, closeEmailModal } = this.props;
+    trashThread(thread.id);
+    closeEmailModal();
   }
 
   render() {
     const { thread, closeEmailModal } = this.props;
     const emails = thread.emails;
+    const gmailUrl = "https://mail.google.com/mail/u/0/#all/" + thread.id;
     console.log(emails.length);
 
     return (
       <div className={s.root}>
         <div className={s.head}>
+          <div className={s.emailButtons}>
+            <a><i className="fa fa-check" onClick={this.handleArchiveThread} aria-hidden="true"></i></a>
+            <a><i className="fa fa-trash" onClick={this.handleTrashThread} aria-hidden="true"></i></a>
+            <a><i className="fa fa-tag" aria-hidden="true"></i></a>
+            <a href={gmailUrl} target="_blank"><i className="fa fa-envelope-o" aria-hidden="true"></i></a>
+          </div>
           <div className={s.subject}>{thread.subject}</div>
           <div className={s.close} onClick={closeEmailModal}></div>
         </div>

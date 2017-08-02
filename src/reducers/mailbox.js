@@ -10,7 +10,9 @@ import {
   PARTIAL_SYNC_MAILBOX_SUCCESS,
   PARTIAL_SYNC_MAILBOX_FAILURE,
   MOVE_CARD,
-  REQUEST_MARK_AS_READ,
+  MARK_AS_READ_REQUEST,
+  TRASH_THREAD_REQUEST,
+  ARCHIVE_THREAD_REQUEST,
 } from '../constants';
 
 function getInsertIndexByDate(array, date) {
@@ -136,22 +138,50 @@ const initialState = new Map();
 
 export default function mailbox(state = initialState, action) {
   switch (action.type) {
-    case REQUEST_MARK_AS_READ:
+    case ARCHIVE_THREAD_REQUEST: {
+      const { threadId } = action;
+      const jsState = state.toJS();
+      let spliceId = null;
+      for (var lane in jsState) {
+        let threads = jsState[lane].threads;
+        for (var i = 0; i < threads.length; i++) {
+          let thread = threads[i];
+          if (thread.id === threadId) {
+            threads.splice(i, 1);
+            break;
+          }
+        }
+      }
+      return fromJS(jsState);
+    }
+    case TRASH_THREAD_REQUEST: {
+      const { threadId } = action;
+      const jsState = state.toJS();
+      let spliceId = null;
+      for (var lane in jsState) {
+        let threads = jsState[lane].threads;
+        for (var i = 0; i < threads.length; i++) {
+          let thread = threads[i];
+          if (thread.id === threadId) {
+            threads.splice(i, 1);
+            break;
+          }
+        }
+      }
+      return fromJS(jsState);
+    }
+    case MARK_AS_READ_REQUEST:
       const { threadId } = action;
       const jsState = state.toJS();
       for (var lane in jsState) {
-        let newLane = [];
         let threads = jsState[lane].threads;
         for (var i = 0; i < threads.length; i++) {
           let thread = threads[i];
           if (thread.id === threadId) {
             thread.unread = false;
+            break
           }
-          newLane.push(thread)
         }
-        console.log(lane);
-        console.log(newLane);
-        jsState[lane].threads = newLane;
       }
       // return state;
       return fromJS(jsState)

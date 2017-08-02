@@ -4,6 +4,7 @@ import { bindActionCreators } from "redux";
 import ReactModal from 'react-modal';
 import { connect } from "react-redux";
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import * as MailBoxActions from '../../actions/mailbox';
 import * as ModalActions from '../../actions/modal';
 import s from './Modal.css';
 import Thread from '../Thread';
@@ -14,11 +15,12 @@ function mapStateToProps(state) {
     isOpen: jsState.modal.isOpen,
     showing: jsState.modal.showing,
     item: jsState.modal.item,
+    labelId: jsState.modal.labelId,
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(ModalActions, dispatch);
+  return bindActionCreators({...ModalActions, ...MailBoxActions}, dispatch);
 }
 
 class Modal extends React.Component {
@@ -26,6 +28,7 @@ class Modal extends React.Component {
     isOpen: PropTypes.bool.isRequired,
     showing: PropTypes.string,
     item: PropTypes.object,
+    labelId: PropTypes.string,
   }
 
   constructor(props) {
@@ -59,6 +62,9 @@ class Modal extends React.Component {
         <Thread
           thread={item}
           closeEmailModal={this.closeEmailModal}
+          archiveThread={this.props.requestArchiveThread}
+          trashThread={this.props.requestTrashThread}
+          labelId={this.props.labelId}
         />
       </ReactModal>
       )

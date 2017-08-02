@@ -58,8 +58,8 @@ class Board extends React.Component {
     this.markAsRead = this.markAsRead.bind(this);
   }
 
-  triggerEmailModal(item) {
-    this.props.triggerEmailModal(item);
+  triggerEmailModal(item, labelId) {
+    this.props.triggerEmailModal(item, labelId);
   }
 
   partialSyncTick() {

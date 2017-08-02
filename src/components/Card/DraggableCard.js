@@ -58,15 +58,16 @@ class DraggableCard extends React.Component {
   }
 
 	render() {
-		const { isDragging, connectDragSource, item } = this.props;
+		const { isDragging, connectDragSource, item, labelId, markAsRead, triggerEmailModal } = this.props;
 
 		return connectDragSource(
   		<div>
         <Card
           style={getStyles(isDragging)}
-          triggerEmailModal={this.props.triggerEmailModal}
+          triggerEmailModal={triggerEmailModal}
           item={item}
-          markAsRead={this.props.markAsRead}
+          markAsRead={markAsRead}
+          labelId={labelId}
         />
       </div>
 		)
