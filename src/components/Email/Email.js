@@ -4,6 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import sanitizeHtml from 'sanitize-html';
 import s from './Email.css';
 import { parseEmailHeader } from '../../utils';
+import moment from 'moment';
 
 class Email extends React.Component {
   static propTypes = {
@@ -13,6 +14,15 @@ class Email extends React.Component {
 
   render() {
     const { email, last } = this.props;
+
+    const dateString = moment(Number(email.date)).calendar(null, {
+      sameDay: '[Today] hh:mm a',
+      nextDay: '[Tomorrow]',
+      nextWeek: 'dddd',
+      lastDay: '[Yesterday] hh:mm a',
+      lastWeek: '[Last] dddd',
+      sameElse: 'DD/MM/YYYY'
+    });
 
     let message = null;
     if (email.textHtml) {
@@ -32,16 +42,16 @@ class Email extends React.Component {
     let fromLine = null;
     const fromText = parseEmailHeader(email.headers.from).name || parseEmailHeader(email.headers.from).email;
     if (!last) {
-      fromLine = <div className={s.fromLast}><div>{fromText}</div><div className={s.preview}>{email.textPlain}</div></div>
+      fromLine = <div className={s.from}><div>{fromText}</div><div className={s.preview}>{email.textPlain}</div></div>
     } else {
-      fromLine = <div className={s.from}><span>{fromText}</span></div>
+      fromLine = <div className={s.fromLast}><span>{fromText}</span></div>
     }
 
     return (
       <div className={last ? s.root: s.rootCollapsed}>
         <div className={s.head}>
           { fromLine }
-          <div className={s.date}>{email.date}</div>
+          <div className={s.date}>{dateString}</div>
         </div>
         { body }
       </div>

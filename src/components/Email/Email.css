@@ -12,6 +12,7 @@
 
 .head {
   color: #777;
+  padding-bottom: 2em;
 }
 
 .bodyPlain {
@@ -25,4 +26,12 @@
   text-overflow: ellipsis;
   color: #777;
   width: 100%;
+}
+
+.fromLast {
+  float: left;
+}
+
+.date {
+  float: right;
 }
