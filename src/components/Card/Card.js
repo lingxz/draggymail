@@ -9,6 +9,7 @@ class Card extends React.Component {
 		item: PropTypes.object.isRequired,
 		style: PropTypes.object,
     triggerEmailModal: PropTypes.func,
+    markAsRead: PropTypes.func,
 	}
 
   constructor(props) {
@@ -17,7 +18,8 @@ class Card extends React.Component {
   }
 
   _handleDoubleClick() {
-    const { item, triggerEmailModal } = this.props;
+    const { item, triggerEmailModal, markAsRead } = this.props;
+    markAsRead(item.id);
     triggerEmailModal(item);
   }
 

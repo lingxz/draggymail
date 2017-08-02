@@ -22,6 +22,9 @@ import {
   REMOVE_LABEL_TO_SHOW_FAILURE,
   MOVE_LABEL,
   MOVE_CARD,
+  REQUEST_MARK_AS_READ,
+  MARK_AS_READ_SUCCESS,
+  MARK_AS_READ_FAILURE,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -205,6 +208,19 @@ export function* moveLabelToShow(action) {
   }
 }
 
+export function* markAsRead(action) {
+  try {
+    const user = yield select(getUser);
+    const res = yield call(MailBoxActions.markAsRead, user, action.threadId)
+    yield put({ type: MARK_AS_READ_SUCCESS })
+    // trigger partial sync
+    yield put({ type: PARTIAL_SYNC_MAILBOX_REQUEST })
+  } catch(err) {
+    console.log(err)
+    yield put({ type: MARK_AS_READ_FAILURE })
+  }
+}
+
 export function* watchAddLabelToShow({ fetch }) {
   yield takeEvery(ADD_LABEL_TO_SHOW, addLabelToShow, fetch)
 }
@@ -223,4 +239,8 @@ export function* watchMoveLabel() {
 
 export function* watchMoveThread() {
   yield takeEvery(MOVE_CARD, moveThread)
+}
+
+export function* watchMarkAsRead() {
+  yield takeEvery(REQUEST_MARK_AS_READ, markAsRead)
 }

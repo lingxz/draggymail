@@ -23,13 +23,15 @@
 }
 
 html {
-  color: #222;
+  /*color: #222;*/
+  color: #2E2D33;
   font-weight: 300;
   font-size: 1em; /* ~16px; */
   font-family: var(--font-family-base);
   line-height: 1.375; /* ~22px */
   position: relative;
   height: 100%;
+  background: #FBFAFB;
 }
 
 body {

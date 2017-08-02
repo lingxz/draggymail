@@ -14,14 +14,15 @@
 }
 
 .root {
-  background: #373277;
-  color: #fff;
+  /*background: #373277;*/
+  /*color: #fff;*/
 }
 
 .container {
-  margin: 0 auto;
+  margin: 40px auto;
   padding: 20px 0;
   max-width: var(--max-content-width);
+  animation: fadeInDown 1s;
 }
 
 .brand {
@@ -42,13 +43,33 @@
   margin: 0;
   padding: 10px;
   font-weight: normal;
-  font-size: 4em;
+  font-size: 5em;
   line-height: 1em;
 }
 
 .bannerDesc {
   padding: 0;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.25em;
+  font-size: 1.5em;
   margin: 0;
+  font-weight: 400;
+}
+
+.logo {
+  width: 150px;
+}
+
+img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+@keyframes fadeInDown {
+  from {
+    margin-top: -40px;
+    opacity: 0;
+  }
+  to {
+    margin-top: 40px;
+    opacity: 1;
+  }
 }

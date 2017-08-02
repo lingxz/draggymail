@@ -8,7 +8,7 @@ import { FULL_SYNC_MAILBOX_REQUEST, LIST_ALL_LABELS_REQUEST } from '../../consta
 function action({ store, fetch, req }) {
   const user = store.getState().toJS().user
   if (!user) {
-    return { redirect: '/login' }
+    return { redirect: '/' }
   }
 
   // if (!store.getState().toJS().labels.labelsToShow) {

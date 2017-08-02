@@ -22,6 +22,7 @@ import {
   REMOVE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW_FAILURE,
   OPEN_EMAIL_MODAL,
+  REQUEST_MARK_AS_READ,
 } from '../constants';
 
 const b64Decode = base64.decode;
@@ -338,8 +339,16 @@ export function requestRemoveLabelToShow(position) {
   return ({ type: REMOVE_LABEL_TO_SHOW, position: position })
 }
 
+export function requestMarkAsRead(threadId) {
+  return ({ type: REQUEST_MARK_AS_READ, threadId: threadId })
+}
+
 export function moveThread(user, threadId, labelToAdd, labelToRemove) {
   return GmailActions.moveThread(user, threadId, labelToAdd, labelToRemove)
+}
+
+export function markAsRead(user, threadId) {
+  return GmailActions.markAsRead(user, threadId)
 }
 
 export function partialSyncMailBox(user, labels, mailbox) {

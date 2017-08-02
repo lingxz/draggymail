@@ -11,6 +11,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Login.css';
+import gmail from './gmail.svg';
 
 class Login extends React.Component {
   static propTypes = {
@@ -21,7 +22,6 @@ class Login extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <h1>{this.props.title}</h1>
           <div className={s.formGroup}>
             <a className={s.google} href="/login/google">
               <svg

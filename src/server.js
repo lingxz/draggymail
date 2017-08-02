@@ -98,11 +98,11 @@ app.get('/login/google',
 
 app.get('/login/google/return',
   passport.authenticate('google', {
-    failureRedirect: '/login',
+    failureRedirect: '/',
     session: true,
   }),
   (req, res) => {
-    res.redirect('/');
+    res.redirect('/app');
   }
 )
 
@@ -110,7 +110,7 @@ app.post('/logout', (req, res) => {
   req.user = null;
   req.logOut();
   req.session.destroy();
-  res.redirect('/login');
+  res.redirect('/');
 });
 
 //

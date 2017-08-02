@@ -48,6 +48,7 @@ class DraggableCard extends React.Component {
     isDragging: PropTypes.bool.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
     triggerEmailModal: PropTypes.func,
+    markAsRead: PropTypes.func,
   }
 
   componentDidMount() {
@@ -61,7 +62,12 @@ class DraggableCard extends React.Component {
 
 		return connectDragSource(
   		<div>
-        <Card style={getStyles(isDragging)} triggerEmailModal={this.props.triggerEmailModal} item={item}/>
+        <Card
+          style={getStyles(isDragging)}
+          triggerEmailModal={this.props.triggerEmailModal}
+          item={item}
+          markAsRead={this.props.markAsRead}
+        />
       </div>
 		)
 	}

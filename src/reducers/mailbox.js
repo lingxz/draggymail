@@ -10,6 +10,7 @@ import {
   PARTIAL_SYNC_MAILBOX_SUCCESS,
   PARTIAL_SYNC_MAILBOX_FAILURE,
   MOVE_CARD,
+  REQUEST_MARK_AS_READ,
 } from '../constants';
 
 function getInsertIndexByDate(array, date) {
@@ -135,6 +136,25 @@ const initialState = new Map();
 
 export default function mailbox(state = initialState, action) {
   switch (action.type) {
+    case REQUEST_MARK_AS_READ:
+      const { threadId } = action;
+      const jsState = state.toJS();
+      for (var lane in jsState) {
+        let newLane = [];
+        let threads = jsState[lane].threads;
+        for (var i = 0; i < threads.length; i++) {
+          let thread = threads[i];
+          if (thread.id === threadId) {
+            thread.unread = false;
+          }
+          newLane.push(thread)
+        }
+        console.log(lane);
+        console.log(newLane);
+        jsState[lane].threads = newLane;
+      }
+      // return state;
+      return fromJS(jsState)
     case MOVE_CARD: {
       const { lastLabelId, nextLabelId, threadId } = action;
       if (lastLabelId === nextLabelId) {

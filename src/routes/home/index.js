@@ -8,24 +8,16 @@
  */
 
 import React from 'react';
-import Home from './Home';
-import Layout from '../../components/Layout';
+import Header from '../../components/Header';
+import Layout from '../../components/KanbanLayout';
+import LoginButton from '../../components/LoginButton'
 
-import * as MailBoxActions from '../../actions/mailbox';
-
-async function action({ store, fetch }) {
-  const resp = await fetch('/graphql', {
-    body: JSON.stringify({
-      query: '{news{title,link,content}}',
-    }),
-  });
-  const { data } = await resp.json();
-  if (!data || !data.news) throw new Error('Failed to load the news feed.');
+function action() {
 
   return {
     chunks: ['home'],
     title: 'React Starter Kit',
-    component: <Layout><Home news={data.news} /></Layout>,
+    component: <Layout><Header /><LoginButton /></Layout>,
   };
 }
 

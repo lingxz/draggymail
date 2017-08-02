@@ -55,6 +55,7 @@ class Board extends React.Component {
     this.requestChangeLabelToShow = this.requestChangeLabelToShow.bind(this);
     this.requestRemoveLabelToShow = this.requestRemoveLabelToShow.bind(this);
     this.triggerEmailModal = this.triggerEmailModal.bind(this);
+    this.markAsRead = this.markAsRead.bind(this);
   }
 
   triggerEmailModal(item) {
@@ -145,6 +146,10 @@ class Board extends React.Component {
     this.props.addLabelToShow();
   }
 
+  markAsRead(threadId) {
+    this.props.requestMarkAsRead(threadId);
+  }
+
   render() {
     const { mailbox, labelsToShow, allLabels } = this.props;
 
@@ -178,6 +183,7 @@ class Board extends React.Component {
             requestRemoveLabel={this.requestRemoveLabelToShow}
             allLabels={allLabels}
             triggerEmailModal={this.triggerEmailModal}
+            markAsRead={this.markAsRead}
             x={i}
           />
         )}

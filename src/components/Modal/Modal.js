@@ -42,9 +42,10 @@ class Modal extends React.Component {
 
     const style = {
       content: {
-        'maxWidth': '600px',
+        'maxWidth': '1000px',
         'margin': '0 auto',
         'padding': '0',
+        'top': '20px',
       }
     };
 

@@ -31,7 +31,7 @@ class Navigation extends React.Component {
   render() {
     return (
       <div className={s.root} role="navigation">
-        { this.props.isLoggedIn && <Link className={s.link} to="/kanban">Emails</Link> }
+        { this.props.isLoggedIn && <Link className={s.link} to="/app">Emails</Link> }
         { this.props.isLoggedIn && <span className={s.spacer}> | </span> }
         { !this.props.isLoggedIn && <Link className={s.link} to="/login">Log in</Link> }
         { !this.props.isLoggedIn && <span className={s.spacer}>or</span> }

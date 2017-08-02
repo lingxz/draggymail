@@ -83,6 +83,7 @@ class CardsContainer extends React.Component {
     requestChangeLabel: PropTypes.func.isRequired,
     requestRemoveLabel: PropTypes.func.isRequired,
     triggerEmailModal: PropTypes.func,
+    markAsRead: PropTypes.func,
   }
   constructor(props) {
     super(props);
@@ -141,6 +142,7 @@ class CardsContainer extends React.Component {
             stopScrolling={this.props.stopScrolling}
             isScrolling={this.props.isScrolling}
             triggerEmailModal={this.props.triggerEmailModal}
+            markAsRead={this.props.markAsRead}
           />
         </div>
       </div>

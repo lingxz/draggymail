@@ -147,6 +147,23 @@ export function fetchManyMessages(user, messageIds) {
 // Modify Emails and messages
 /* **************************************************************************/
 
+export function markAsRead(user, threadId) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/threads/" + threadId + "/modify";
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      "Authorization": "Bearer " + user.accessToken,
+      "Content-Type": 'application/json',
+      "Accept": 'application/json',
+    },
+    body: JSON.stringify({
+      addLabelIds: [],
+      removeLabelIds: ['UNREAD'],
+    })
+  })
+    .then(response => response.json())
+}
+
 export function moveThread(user, threadId, labelToAdd, labelToRemove) {
   const url = "https://www.googleapis.com/gmail/v1/users/me/threads/" + threadId + "/modify";
   return fetch(url, {

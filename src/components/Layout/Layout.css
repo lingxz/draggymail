@@ -20,11 +20,12 @@
  * ========================================================================== */
 
 html {
-  color: #222;
+  color: #2E2D33;
   font-weight: 300;
-  font-size: 1em; /* ~16px; */
+  /*font-size: 1em;*/
   font-family: var(--font-family-base);
   line-height: 1.375; /* ~22px */
+  background: #FBFAFB;
 }
 
 body {

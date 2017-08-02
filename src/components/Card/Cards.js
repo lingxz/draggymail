@@ -95,6 +95,7 @@ class Cards extends React.Component {
     stopScrolling: PropTypes.func,
     isScrolling: PropTypes.bool,
     triggerEmailModal: PropTypes.func,
+    markAsRead: PropTypes.func,
   }
 
   constructor(props) {
@@ -119,6 +120,7 @@ class Cards extends React.Component {
             key={item.id}
             stopScrolling={this.props.stopScrolling}
             triggerEmailModal={this.props.triggerEmailModal}
+            markAsRead={this.props.markAsRead}
           />
         )}
         { cards.length === 0 &&

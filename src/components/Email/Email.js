@@ -16,7 +16,8 @@ class Email extends React.Component {
 
     let message = null;
     if (email.textHtml) {
-      message = <div className={s.bodyHtml} dangerouslySetInnerHTML={{__html: sanitizeHtml(email.textHtml)}}></div>;
+      // message = <div className={s.bodyHtml} dangerouslySetInnerHTML={{__html: sanitizeHtml(email.textHtml)}}></div>;
+      message = <div className={s.bodyHtml} dangerouslySetInnerHTML={{__html: email.textHtml}}></div>;
     } else {
       message = <div className={s.bodyPlain}>{email.textPlain}</div>;
     }
@@ -40,6 +41,7 @@ class Email extends React.Component {
       <div className={last ? s.root: s.rootCollapsed}>
         <div className={s.head}>
           { fromLine }
+          <div className={s.date}>{email.date}</div>
         </div>
         { body }
       </div>
