@@ -18,6 +18,13 @@ class Thread extends React.Component {
     this.handleTrashThread = this.handleTrashThread.bind(this);
   }
 
+  // componentDidMount() {
+  //   const header = document.getElementById('header');
+  //   const contentPlacement = header.getBoundingClientRect().top + header.clientHeight;
+  //   const content = document.getElementById('content');
+  //   content.style['margin-top'] = contentPlacement;
+  // }
+
   handleArchiveThread() {
     const { thread, archiveThread, labelId, closeEmailModal } = this.props;
     archiveThread(thread.id, labelId)
@@ -38,7 +45,7 @@ class Thread extends React.Component {
 
     return (
       <div className={s.root}>
-        <div className={s.head}>
+        <div id="header" className={s.head}>
           <div className={s.emailButtons}>
             <a><i className="fa fa-check" onClick={this.handleArchiveThread} aria-hidden="true"></i></a>
             <a><i className="fa fa-trash" onClick={this.handleTrashThread} aria-hidden="true"></i></a>
@@ -48,7 +55,7 @@ class Thread extends React.Component {
           <div className={s.subject}>{thread.subject}</div>
           <div className={s.close} onClick={closeEmailModal}></div>
         </div>
-        <div className={s.emails}>
+        <div id="content" className={s.emails}>
           {emails && emails.map((item, i) =>
             <Email
               key={i}

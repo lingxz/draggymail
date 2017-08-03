@@ -49,6 +49,8 @@ class DraggableCard extends React.Component {
     connectDragPreview: PropTypes.func.isRequired,
     triggerEmailModal: PropTypes.func,
     markAsRead: PropTypes.func,
+    archiveThread: PropTypes.func,
+    trashThread: PropTypes.func,
   }
 
   componentDidMount() {
@@ -68,6 +70,8 @@ class DraggableCard extends React.Component {
           item={item}
           markAsRead={markAsRead}
           labelId={labelId}
+          archiveThread={this.props.archiveThread}
+          trashThread={this.props.trashThread}
         />
       </div>
 		)

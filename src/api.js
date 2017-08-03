@@ -17,6 +17,9 @@ router.post('/google/refresh-token', (req, res) => {
     refresh_token: req.body.refreshToken,
   })
   oauth.refreshAccessToken((err, tokens) => {
+    if (!req.user) {
+      req.user = {}
+    }
     req.user.accessToken = tokens.access_token;
     tokens.expiryTime = tokens.expiry_date;
     req.user.expiryTime = tokens.expiry_date;

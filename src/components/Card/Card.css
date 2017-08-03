@@ -14,6 +14,14 @@
 	background: #f7f7f7;
 }
 
+.root:hover .emailButtons {
+  opacity: 1;
+}
+
+.root:hover .name {
+  overflow: hidden;
+}
+
 .unread {
   overflow: hidden;
   background: #fff;
@@ -31,10 +39,10 @@
 .name {
 	padding: 5px 10px;
   padding-bottom: 0px;
-	/*border-bottom: 1px solid #dbdbdb;*/
-	white-space: normal;
-	word-break: break-all;
-	word-wrap: break-world;
+  float: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .container {
@@ -68,6 +76,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  margin-bottom: 0;
 }
 
 .author {
@@ -77,4 +86,39 @@
 
 .author p {
 	margin: 5px 0;
+}
+
+.emailButtons {
+  opacity: 0;
+  padding: 5px 10px;
+  float: right;
+  position: absolute;
+  right: 0;
+}
+
+.emailButtons a {
+  color: inherit !important;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.emailButtons i {
+  padding-right: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.emailButtons i:hover {
+  opacity: 0.7;
+}
+
+.emailHead {
+  position: relative;
+}
+
+.emailHead::after {
+   content: " ";
+   display: block;
+   height: 0;
+   clear: both;
 }

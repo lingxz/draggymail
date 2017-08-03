@@ -96,6 +96,8 @@ class Cards extends React.Component {
     isScrolling: PropTypes.bool,
     triggerEmailModal: PropTypes.func,
     markAsRead: PropTypes.func,
+    archiveThread: PropTypes.func,
+    trashThread: PropTypes.func,
   }
 
   constructor(props) {
@@ -121,6 +123,8 @@ class Cards extends React.Component {
             stopScrolling={this.props.stopScrolling}
             triggerEmailModal={this.props.triggerEmailModal}
             markAsRead={this.props.markAsRead}
+            archiveThread={this.props.archiveThread}
+            trashThread={this.props.trashThread}
           />
         )}
         { cards.length === 0 &&

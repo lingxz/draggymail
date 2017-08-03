@@ -12,15 +12,30 @@ class Email extends React.Component {
     last: PropTypes.bool,
   }
 
+  constructor(props) {
+    super(props);
+    this.toggleExpanded = this.toggleExpanded.bind(this);
+    this.state = {
+      expanded: props.last,
+      gmailExtraExpanded: false,
+    }
+  }
+
+  toggleExpanded() {
+    this.setState({ expanded: !this.state.expanded, });
+    console.log("toggle expanded!!!")
+  }
+
   render() {
-    const { email, last } = this.props;
+    const { email } = this.props;
+    const { expanded } = this.state;
 
     const dateString = moment(Number(email.date)).calendar(null, {
       sameDay: '[Today] hh:mm a',
       nextDay: '[Tomorrow]',
       nextWeek: 'dddd',
       lastDay: '[Yesterday] hh:mm a',
-      lastWeek: '[Last] dddd',
+      lastWeek: 'DD/MM/YYYY',
       sameElse: 'DD/MM/YYYY'
     });
 
@@ -33,7 +48,7 @@ class Email extends React.Component {
     }
 
     let body = null;
-    if (last) {
+    if (expanded) {
       body = message;
     } else {
       body = null;
@@ -41,19 +56,21 @@ class Email extends React.Component {
 
     let fromLine = null;
     const fromText = parseEmailHeader(email.headers.from).name || parseEmailHeader(email.headers.from).email;
-    if (!last) {
+    if (!expanded) {
       fromLine = <div className={s.from}><div>{fromText}</div><div className={s.preview}>{email.textPlain}</div></div>
     } else {
       fromLine = <div className={s.fromLast}><span>{fromText}</span></div>
     }
 
     return (
-      <div className={last ? s.root: s.rootCollapsed}>
-        <div className={s.head}>
-          { fromLine }
+      <div className={expanded ? s.root: s.rootCollapsed}>
+        <div className={s.head} onClick={this.toggleExpanded}>
           <div className={s.date}>{dateString}</div>
+          { fromLine }
         </div>
+        {expanded && <div className={s.emailBody}>
         { body }
+        </div>}
       </div>
     );
   }

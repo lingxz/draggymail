@@ -184,6 +184,8 @@ class Board extends React.Component {
             allLabels={allLabels}
             triggerEmailModal={this.triggerEmailModal}
             markAsRead={this.markAsRead}
+            archiveThread={this.props.requestArchiveThread}
+            trashThread={this.props.requestTrashThread}
             x={i}
           />
         )}
