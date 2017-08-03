@@ -91,6 +91,17 @@ class CardsContainer extends React.Component {
     super(props);
     this.onLabelChange = this.onLabelChange.bind(this);
     this.handleCloseClick = this.handleCloseClick.bind(this);
+    this._handleClickLabel = this._handleClickLabel.bind(this);
+    this._handleOnBlur = this._handleOnBlur.bind(this);
+    this.state = { showSelectable: false }
+  }
+
+  _handleClickLabel() {
+    this.setState({ showSelectable: true })
+  }
+
+  _handleOnBlur() {
+    this.setState({ showSelectable: false })
   }
 
   onLabelChange(newLabel) {
@@ -105,6 +116,7 @@ class CardsContainer extends React.Component {
 
 	render() {
     const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging, allLabels } = this.props;
+    const { showSelectable } = this.state;
     const threads = item.threads || [];
 
     // construct options, react select requires options to be in specific format
@@ -120,15 +132,21 @@ class CardsContainer extends React.Component {
       <div className={s.root}>
         <div className={s.head}>
           <div className={s.name}>
-            <div className={s.selectWrapper}>
-              <Select
-                name="label"
-                clearable={false}
-                value={item.id}
-                options={options}
-                onChange={this.onLabelChange}
-              />
-            </div>
+            {showSelectable &&
+              <div onBlur={this._handleOnBlur} className={s.selectWrapper}>
+                <Select
+                  autofocus
+                  name="label"
+                  clearable={false}
+                  value={item.id}
+                  options={options}
+                  onChange={this.onLabelChange}
+                />
+              </div>
+            }
+            {!showSelectable &&
+              <div className={s.notSelectableName} onClick={this._handleClickLabel}>{item.name}</div>
+            }
             <div className={s.close} onClick={this.handleCloseClick}></div>
           </div>
         </div>
