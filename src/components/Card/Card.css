@@ -36,6 +36,14 @@
   background: #f7f7f7;
 }
 
+.unread:hover .emailButtons {
+  opacity: 1;
+}
+
+.unread:hover .name {
+  overflow: hidden;
+}
+
 .name {
 	padding: 5px 10px;
   padding-bottom: 0px;

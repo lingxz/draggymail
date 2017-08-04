@@ -186,6 +186,8 @@ class Board extends React.Component {
             markAsRead={this.markAsRead}
             archiveThread={this.props.requestArchiveThread}
             trashThread={this.props.requestTrashThread}
+            renameLabel={this.props.requestRenameLabel}
+            createLabel={this.props.requestCreateLabel}
             x={i}
           />
         )}

@@ -75,3 +75,19 @@
 .close:after {
   transform: rotate(-45deg);
 }
+
+.labelButtons i {
+  padding-left: 5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.labelButtons i:hover {
+  opacity: 0.7;
+}
+
+.editBox {
+  line-height: 34px;
+  padding-left: 10px;
+  padding-right: 10px;
+}

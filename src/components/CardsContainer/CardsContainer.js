@@ -86,6 +86,8 @@ class CardsContainer extends React.Component {
     markAsRead: PropTypes.func,
     archiveThread: PropTypes.func,
     trashThread: PropTypes.func,
+    renameLabel: PropTypes.func,
+    createLabel: PropTypes.func,
   }
   constructor(props) {
     super(props);
@@ -93,7 +95,15 @@ class CardsContainer extends React.Component {
     this.handleCloseClick = this.handleCloseClick.bind(this);
     this._handleClickLabel = this._handleClickLabel.bind(this);
     this._handleOnBlur = this._handleOnBlur.bind(this);
-    this.state = { showSelectable: false }
+    this._handleRenameLabel = this._handleRenameLabel.bind(this);
+    this._handleCreateLabel = this._handleCreateLabel.bind(this);
+    this._startRenameLabel = this._startRenameLabel.bind(this);
+    this._startCreateLabel = this._startCreateLabel.bind(this);
+    this.state = {
+      showSelectable: false,
+      showCreateLabelBox: false,
+      showEditLabelBox: false,
+    }
   }
 
   _handleClickLabel() {
@@ -101,7 +111,7 @@ class CardsContainer extends React.Component {
   }
 
   _handleOnBlur() {
-    this.setState({ showSelectable: false })
+    this.setState({ showSelectable: false, showEditLabelBox: false, showCreateLabelBox: false })
   }
 
   onLabelChange(newLabel) {
@@ -114,9 +124,37 @@ class CardsContainer extends React.Component {
     requestRemoveLabel(x);
   }
 
+  _startRenameLabel() {
+    this.setState({ showEditLabelBox: true })
+  }
+
+  _startCreateLabel() {
+    this.setState({ showCreateLabelBox: true })
+  }
+
+  _handleRenameLabel(e) {
+    e.preventDefault();
+    const newLabelName = this.editBox.value;
+    if (!(newLabelName === this.props.item.name) && newLabelName) {
+      console.log("this is new name!!!");
+      console.log(newLabelName);
+      this.props.renameLabel(this.props.item.id, newLabelName)
+    }
+    this._handleOnBlur();
+  }
+
+  _handleCreateLabel(e) {
+    e.preventDefault();
+    const newLabelName = this.createBox.value;
+    if (newLabelName) {
+      this.props.createLabel(newLabelName, this.props.x);
+    }
+    this._handleOnBlur();
+  }
+
 	render() {
     const { connectDropTarget, connectDragSource, labelId, item, x, moveCard, isDragging, allLabels } = this.props;
-    const { showSelectable } = this.state;
+    const { showSelectable, showEditLabelBox, showCreateLabelBox } = this.state;
     const threads = item.threads || [];
 
     // construct options, react select requires options to be in specific format
@@ -144,8 +182,40 @@ class CardsContainer extends React.Component {
                 />
               </div>
             }
-            {!showSelectable &&
-              <div className={s.notSelectableName} onClick={this._handleClickLabel}>{item.name}</div>
+            {showEditLabelBox &&
+              <form onSubmit={this._handleRenameLabel}>
+                <input
+                  autoFocus
+                  className={s.editBox}
+                  onBlur={this._handleOnBlur}
+                  type="text"
+                  defaultValue={item.name}
+                  ref={el => this.editBox = el}
+                />
+              </form>
+            }
+            {showCreateLabelBox &&
+              <form onSubmit={this._handleCreateLabel}>
+                <input
+                  autoFocus
+                  className={s.editBox}
+                  onBlur={this._handleOnBlur}
+                  type="text"
+                  defaultValue={item.name}
+                  ref={el => this.createBox = el}
+                />
+              </form>
+            }
+            {!showSelectable && !showEditLabelBox && !showCreateLabelBox &&
+              <div>
+                <div className={s.notSelectableName}>
+                  <span onClick={this._handleClickLabel}>{item.name}</span>
+                  <span className={s.labelButtons}>
+                    <i title="Edit label name" className="fa fa-pencil" onClick={this._startRenameLabel} aria-hidden="true"></i>
+                    <i title="Create new label" className="fa fa-plus" onClick={this._startCreateLabel} aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
             }
             <div className={s.close} onClick={this.handleCloseClick}></div>
           </div>

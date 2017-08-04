@@ -29,14 +29,25 @@ router.post('/google/refresh-token', (req, res) => {
 
 router.post('/add-label', (req, res) => {
   console.log(req.body);
-  Label.create({
-    labelId: req.body.labelId,
-    position: req.body.position,
-    userId: req.user.id,
-  })
-    .then(label => {
-      res.sendStatus(200)
+  sequelize.transaction(t => {
+    return Label.update({ position: sequelize.literal("position +1")}, {
+      where: {
+        position: { $gte: req.body.position },
+        userId: req.user.id,
+      },
+      transaction: t,
     })
+      .then(() => {
+        return Label.create({
+          labelId: req.body.labelId,
+          position: req.body.position,
+          userId: req.user.id,
+        }, { transaction: t })
+      })
+      .then(() => {
+        res.sendStatus(200)
+      })
+  })
 })
 
 router.post('/change-label', (req, res) => {

@@ -25,6 +25,8 @@ import {
   MARK_AS_READ_REQUEST,
   ARCHIVE_THREAD_REQUEST,
   TRASH_THREAD_REQUEST,
+  CREATE_LABEL_REQUEST,
+  RENAME_LABEL_REQUEST,
 } from '../constants';
 
 const b64Decode = base64.decode;
@@ -373,6 +375,31 @@ export function requestArchiveThread(threadId, currentThreadId) {
 
 export function requestTrashThread(threadId) {
   return ({ type: TRASH_THREAD_REQUEST, threadId: threadId })
+}
+
+export function requestCreateLabel(labelName, oldLabelIndex) {
+  return ({ type: CREATE_LABEL_REQUEST, labelName, oldLabelIndex })
+}
+
+export function createLabel(user, labelName) {
+  const reqBody = {
+    name: labelName,
+    labelListVisibility: 'labelShow',
+    messageListVisibility: 'show',
+  }
+  return GmailActions.createLabel(user, reqBody)
+}
+
+export function requestRenameLabel(labelId, newLabelName) {
+  return ({ type: RENAME_LABEL_REQUEST, labelId, newLabelName })
+}
+
+export function renameLabel(user, labelId, newName) {
+  const reqBody = {
+    id: labelId,
+    name: newName
+  }
+  return GmailActions.modifyLabel(user, labelId, reqBody)
 }
 
 export function partialSyncMailBox(user, labels, mailbox) {

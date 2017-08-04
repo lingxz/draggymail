@@ -176,3 +176,35 @@ export function trashThread(user, threadId) {
   })
     .then(response => response.json())
 }
+
+/* **************************************************************************/
+// Modify Emails and messages
+/* **************************************************************************/
+
+export function modifyLabel(user, labelId, reqBody) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/labels/" + labelId;
+  return fetch(url, {
+    method: 'PATCH',
+    headers: {
+      "Authorization": "Bearer " + user.accessToken,
+      "Content-Type": 'application/json',
+      "Accept": 'application/json',
+    },
+    body: JSON.stringify(reqBody)
+  })
+    .then(response => response.json())
+}
+
+export function createLabel(user, reqBody) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/labels";
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      "Authorization": "Bearer " + user.accessToken,
+      "Content-Type": 'application/json',
+      "Accept": 'application/json',
+    },
+    body: JSON.stringify(reqBody)
+  })
+    .then(response => response.json())
+}

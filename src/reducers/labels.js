@@ -13,6 +13,7 @@ import {
   CHANGE_LABEL_TO_SHOW_SUCCESS,
   REMOVE_LABEL_TO_SHOW,
   REMOVE_LABEL_TO_SHOW_SUCCESS,
+  CREATE_LABEL_SUCCESS,
 } from '../constants';
 
 
@@ -26,6 +27,12 @@ const initialState = fromJS({
 // const initialState = new InitialState;
 export default function labels(state = initialState, action) {
   switch (action.type) {
+    case CREATE_LABEL_SUCCESS: {
+      const jsState = state.toJS();
+      jsState.allLabels.push(action.newLabel);
+      jsState.labelsToShow.splice(action.oldLabelIndex + 1, 0, action.newLabel.id)
+      return fromJS(jsState);
+    }
     case REMOVE_LABEL_TO_SHOW_SUCCESS: {
       const labelsToShow = state.toJS().labelsToShow;
       labelsToShow.splice(action.position, 1)

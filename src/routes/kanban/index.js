@@ -7,15 +7,10 @@ import { FULL_SYNC_MAILBOX_REQUEST, LIST_ALL_LABELS_REQUEST } from '../../consta
 
 function action({ store, fetch, req }) {
   const user = store.getState().toJS().user
-  if (!user) {
+  if (!user || !user.accessToken) {
     return { redirect: '/' }
   }
 
-  // if (!store.getState().toJS().labels.labelsToShow) {
-  //   const labelsToShow =
-  // } else {
-  //   const labelsToShow = store.getState().toJS().labels.labelsToShow;
-  // }
   if (!store.getState().toJS().labels.latestHistoryId) {
     store.dispatch({ type: FULL_SYNC_MAILBOX_REQUEST })
     store.dispatch({ type: LIST_ALL_LABELS_REQUEST })

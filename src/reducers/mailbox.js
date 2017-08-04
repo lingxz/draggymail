@@ -13,6 +13,8 @@ import {
   MARK_AS_READ_REQUEST,
   TRASH_THREAD_REQUEST,
   ARCHIVE_THREAD_REQUEST,
+  RENAME_LABEL_SUCCESS,
+  CREATE_LABEL_SUCCESS,
 } from '../constants';
 
 function getInsertIndexByDate(array, date) {
@@ -138,6 +140,33 @@ const initialState = new Map();
 
 export default function mailbox(state = initialState, action) {
   switch (action.type) {
+    case CREATE_LABEL_SUCCESS: {
+      const newLabel = action.newLabel;
+      const newLabelItem = {
+        id: newLabel.id,
+        name: newLabel.name,
+        type: newLabel.type,
+        messagesTotal: newLabel.messagesTotal,
+        messagesUnread: newLabel.messagesUnread,
+        threadsTotal: newLabel.threadsTotal,
+        threadsUnread: newLabel.threadsUnread,
+        isFetching: false,
+        threads: [],
+      }
+      return state.set(newLabel.id, fromJS(newLabelItem))
+    }
+    case RENAME_LABEL_SUCCESS: {
+      const { labelId, newLabel } = action;
+      const newLabelName = newLabel.name;
+      const jsState = state.toJS();
+      for (var label in jsState) {
+        if (jsState[label].id === labelId) {
+          jsState[label].name = newLabel.name;
+          break;
+        }
+      }
+      return fromJS(jsState)
+    }
     case ARCHIVE_THREAD_REQUEST: {
       const { threadId } = action;
       const jsState = state.toJS();

@@ -31,6 +31,12 @@ import {
   TRASH_THREAD_REQUEST,
   TRASH_THREAD_SUCCESS,
   TRASH_THREAD_FAILURE,
+  CREATE_LABEL_REQUEST,
+  CREATE_LABEL_SUCCESS,
+  CREATE_LABEL_FAILURE,
+  RENAME_LABEL_REQUEST,
+  RENAME_LABEL_SUCCESS,
+  RENAME_LABEL_FAILURE,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -253,6 +259,50 @@ export function* trashThread(action) {
   }
 }
 
+export function* renameLabel(action) {
+  try {
+    const user = yield select(getUser);
+    const res = yield call(MailBoxActions.renameLabel, user, action.labelId, action.newLabelName);
+    console.log(res);
+    if (res.error) {
+      yield put({ type: RENAME_LABEL_FAILURE })
+    } else {
+      yield put({ type: RENAME_LABEL_SUCCESS, labelId: action.labelId, newLabel: res })
+    }
+  } catch(err) {
+    console.log(err);
+    yield put({ type: RENAME_LABEL_FAILURE })
+  }
+}
+
+export function* createLabel(action) {
+  try {
+    const user = yield select(getUser);
+    const res = yield call(MailBoxActions.createLabel, user, action.labelName);
+    if (!res.error) {
+      // store in db
+      const position = action.oldLabelIndex + 1;
+      console.log(position);
+      const opts = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ labelId: res.id, position: position })
+      }
+      const dbRes = yield call(fetch, '/api/add-label', opts);
+      yield put({ type: CREATE_LABEL_SUCCESS, oldLabelIndex: action.oldLabelIndex, newLabel: res })
+    } else {
+      yield put({ type: CREATE_LABEL_FAILURE })
+    }
+  } catch(err) {
+    console.log(err);
+    yield put({ type: CREATE_LABEL_FAILURE })
+  }
+}
+
 export function* watchAddLabelToShow({ fetch }) {
   yield takeEvery(ADD_LABEL_TO_SHOW, addLabelToShow, fetch)
 }
@@ -283,4 +333,12 @@ export function* watchArchiveThread() {
 
 export function* watchTrashThread() {
   yield takeEvery(TRASH_THREAD_REQUEST, trashThread)
+}
+
+export function* watchCreateLabel() {
+  yield takeEvery(CREATE_LABEL_REQUEST, createLabel)
+}
+
+export function* watchRenameLabel() {
+  yield takeEvery(RENAME_LABEL_REQUEST, renameLabel)
 }
