@@ -58,6 +58,7 @@ class Modal extends React.Component {
          contentLabel="Minimal Modal Example"
          shouldCloseOnOverlayClick={true}
          style={style}
+         onRequestClose={this.closeEmailModal}
       >
         <Thread
           thread={item}

@@ -12,3 +12,23 @@ export function parseEmailHeader(header) {
   }
   return extract;
 }
+
+export function parseEmailHeadersTo(header) {
+  const receivers = header.split(",");
+  const recipientsList = [];
+  const recipientsListPrintable = [];
+  for (var i = 0; i < receivers.length; i++) {
+    let parsedObj = parseEmailHeader(receivers[i])
+    recipientsList.push(parsedObj);
+    if (parsedObj.name || parsedObj.email) {
+      if (parsedObj.name) {
+        recipientsListPrintable.push(parsedObj.name)
+      } else {
+        recipientsListPrintable.push(parsedObj.email)
+      }
+      recipientsList.push(parsedObj);
+    }
+  }
+  return { recipientsList, recipientsListPrintable }
+}
+

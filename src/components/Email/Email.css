@@ -32,6 +32,13 @@
 
 .fromLast {
   float: left;
+  font-weight: bold;
+  color: #222;
+}
+
+.from {
+  font-weight: bold;
+  color: #222;
 }
 
 .date {
@@ -47,6 +54,10 @@
 
 .emailBody {
   margin-top: 1em;
+}
+
+.to {
+  color: #777;
 }
 
 :global {

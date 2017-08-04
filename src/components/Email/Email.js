@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import sanitizeHtml from 'sanitize-html';
 import s from './Email.css';
-import { parseEmailHeader } from '../../utils';
+import { parseEmailHeadersTo, parseEmailHeader } from '../../utils';
 import moment from 'moment';
 
 class Email extends React.Component {
@@ -57,9 +57,16 @@ class Email extends React.Component {
     let fromLine = null;
     const fromText = parseEmailHeader(email.headers.from).name || parseEmailHeader(email.headers.from).email;
     if (!expanded) {
-      fromLine = <div className={s.from}><div>{fromText}</div><div className={s.preview}>{email.textPlain}</div></div>
+      fromLine = <div><div className={s.from}>{fromText}</div><div className={s.preview}>{email.textPlain}</div></div>
     } else {
       fromLine = <div className={s.fromLast}><span>{fromText}</span></div>
+    }
+
+    let toLine = null;
+    if (expanded) {
+      const { recipientsList, recipientsListPrintable } = parseEmailHeadersTo(email.headers.to);
+      console.log(recipientsList);
+      toLine = <div className={s.to}>to {recipientsListPrintable.join()}</div>
     }
 
     return (
@@ -68,6 +75,7 @@ class Email extends React.Component {
           <div className={s.date}>{dateString}</div>
           { fromLine }
         </div>
+        { toLine }
         {expanded && <div className={s.emailBody}>
         { body }
         </div>}
