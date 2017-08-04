@@ -47,10 +47,10 @@ class Card extends React.Component {
 	      <div className={s.emailHead}>
           <div className={s.name}>{parseEmailHeader(item.from).name || parseEmailHeader(item.from).email}</div>
           <div className={s.emailButtons}>
-            <a><i className="fa fa-check" onClick={this._handleArchiveThread} aria-hidden="true"></i></a>
-            <a><i className="fa fa-trash" onClick={this._handleTrashThread} aria-hidden="true"></i></a>
-            <a><i className="fa fa-tag" aria-hidden="true"></i></a>
-            <a href={gmailUrl} target="_blank"><i className="fa fa-envelope-o" aria-hidden="true"></i></a>
+            <a><i title="Archive thread" className="fa fa-check" onClick={this._handleArchiveThread} aria-hidden="true"></i></a>
+            <a><i title="Trash thread" className="fa fa-trash" onClick={this._handleTrashThread} aria-hidden="true"></i></a>
+            <a><i title="Change labels" className="fa fa-tag" aria-hidden="true"></i></a>
+            <a title="Open in Gmail" href={gmailUrl} target="_blank"><i className="fa fa-envelope-o" aria-hidden="true"></i></a>
           </div>
         </div>
 	      <div className={s.container}>

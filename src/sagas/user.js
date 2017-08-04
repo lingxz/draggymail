@@ -16,7 +16,7 @@ import {
 // not sure if passing fetch all the way down is the correct way to do it...but it works
 function* refreshAuth(user, fetch) {
   while (true) {
-    yield call(delay, user.expiryTime - (new Date()).getTime() - 10 * 1000)
+    yield call(delay, user.expiryTime - (new Date()).getTime() - 60 * 1000)
     let newUser = yield call(MailBoxActions.refreshAuth, user, fetch)
     yield put({ type: UPDATE_USER_CREDENTIALS, user: newUser })
   }

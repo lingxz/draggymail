@@ -49,8 +49,36 @@
   margin-top: 1em;
 }
 
-.gmail_extra {
-  :global {
-    display: none;
+:global {
+/*Make quoted replies a small block*/
+  .gmail_extra {
+    height: 30px;
+    overflow:hidden;
+    display:block;
+  }
+
+  .gmail_extra:hover {
+    height:auto;
+    width:auto;
+    overflow:auto;
+  }
+
+  .gmail_extra:before {
+    content: "\B7\B7\B7";
+    color:#666666;
+    font-size: 19px;
+  }
+
+  .gmail_extra .gmail_extra,
+  .im .gmail_extra,
+  .gmail_extra .im {
+    height:auto;
+    max-height:none;
+    width:auto;
+    overflow:auto;
+  }
+
+  .gmail_extra .im:before {
+    content:"";
   }
 }
