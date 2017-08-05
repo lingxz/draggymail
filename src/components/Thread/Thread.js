@@ -11,12 +11,14 @@ class Thread extends React.Component {
     archiveThread: PropTypes.func,
     trashThread: PropTypes.func,
     user: PropTypes.object,
+    toggleLabelSelector: PropTypes.func,
   }
 
   constructor(props) {
     super(props);
     this.handleArchiveThread = this.handleArchiveThread.bind(this);
     this.handleTrashThread = this.handleTrashThread.bind(this);
+    this._handleToggleLabelSelector = this._handleToggleLabelSelector.bind(this);
   }
 
   // componentDidMount() {
@@ -37,12 +39,15 @@ class Thread extends React.Component {
     trashThread(thread.id);
     closeEmailModal();
   }
+  _handleToggleLabelSelector(e) {
+    const { thread, toggleLabelSelector } = this.props;
+    toggleLabelSelector(thread.id, thread, e.pageX, e.pageY + 15, thread.labelIds)
+  }
 
   render() {
     const { thread, closeEmailModal, user } = this.props;
     const emails = thread.emails;
     const gmailUrl = "https://mail.google.com/mail/u/0/#all/" + thread.id;
-    console.log(emails.length);
 
     return (
       <div className={s.root}>
@@ -50,7 +55,7 @@ class Thread extends React.Component {
           <div className={s.emailButtons}>
             <a><i title="Archive thread" className="fa fa-check" onClick={this.handleArchiveThread} aria-hidden="true"></i></a>
             <a><i title="Trash thread" className="fa fa-trash" onClick={this.handleTrashThread} aria-hidden="true"></i></a>
-            <a><i title="Change labels" className="fa fa-tag" aria-hidden="true"></i></a>
+            <a><i title="Change labels" onClick={this._handleToggleLabelSelector} className="fa fa-tag" aria-hidden="true"></i></a>
             <a title="Open in Gmail" href={gmailUrl} target="_blank"><i className="fa fa-envelope-o" aria-hidden="true"></i></a>
           </div>
           <div className={s.subject}>{thread.subject}</div>

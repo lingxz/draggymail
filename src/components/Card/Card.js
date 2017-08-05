@@ -42,7 +42,7 @@ class Card extends React.Component {
   }
   _toggleLabelSelector(e) {
     const { item, toggleLabelSelector, currentBoard } = this.props;
-    this.props.toggleLabelSelector(item.id, item, e.pageX, e.pageY, item.labelIds, currentBoard)
+    this.props.toggleLabelSelector(item.id, item, e.pageX - 300, e.pageY + 15, item.labelIds, currentBoard)
   }
 
 	render() {

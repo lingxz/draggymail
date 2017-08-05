@@ -85,8 +85,8 @@ class LabelSelector extends React.Component {
     }
 
     const style = {
-      left: x - 300,
-      top: y + 15,
+      left: x,
+      top: y,
     };
     return (
         <div autoFocus style={style} onBlur={closeLabelSelector} className={isOpen ? s.root: s.hidden}>

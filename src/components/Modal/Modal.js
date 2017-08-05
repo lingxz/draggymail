@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import * as MailBoxActions from '../../actions/mailbox';
 import * as ModalActions from '../../actions/modal';
+import * as LabelSelectorActions from '../../actions/labelSelector';
 import s from './Modal.css';
 import Thread from '../Thread';
 
@@ -21,7 +22,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({...ModalActions, ...MailBoxActions}, dispatch);
+  return bindActionCreators({...ModalActions, ...MailBoxActions, ...LabelSelectorActions}, dispatch);
 }
 
 class Modal extends React.Component {
@@ -68,6 +69,7 @@ class Modal extends React.Component {
           closeEmailModal={this.closeEmailModal}
           archiveThread={this.props.requestArchiveThread}
           trashThread={this.props.requestTrashThread}
+          toggleLabelSelector={this.props.toggleLabelSelector}
           labelId={this.props.labelId}
         />
       </ReactModal>
