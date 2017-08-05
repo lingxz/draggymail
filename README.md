@@ -1,4 +1,4 @@
-# Donemail
+# donemail
 
 Drag your emails around like in trello boards.
 
