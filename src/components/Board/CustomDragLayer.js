@@ -30,7 +30,7 @@ function getItemStyles(props) {
     y += initialOffset.y;
   }
 
-  const transform = `translate(${x}px, ${y}px)`;
+  const transform = `translate(${x}px, ${y-40}px)`;
   return {
     WebkitTransform: transform,
     transform

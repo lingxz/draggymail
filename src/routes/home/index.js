@@ -10,7 +10,7 @@
 import React from 'react';
 import Header from '../../components/Header';
 import Layout from '../../components/KanbanLayout';
-import LoginButton from '../../components/LoginButton'
+import LoginButton from '../../components/LoginButton';
 
 function action() {
 

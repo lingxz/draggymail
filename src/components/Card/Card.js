@@ -8,7 +8,7 @@ import { parseEmailHeader } from '../../utils';
 class Card extends React.Component {
 	static propTypes = {
 		item: PropTypes.object.isRequired,
-    labelId: PropTypes.string.isRequired,
+    labelId: PropTypes.string,
 		style: PropTypes.object,
     triggerEmailModal: PropTypes.func,
     markAsRead: PropTypes.func,

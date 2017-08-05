@@ -3,6 +3,7 @@ import Layout from '../../components/KanbanLayout';
 import Board from '../../components/Board';
 import Modal from '../../components/Modal';
 import LabelSelector from '../../components/LabelSelector';
+import Navigation from '../../components/Navigation';
 import * as MailBoxActions from '../../actions/mailbox';
 import { FULL_SYNC_MAILBOX_REQUEST, LIST_ALL_LABELS_REQUEST } from '../../constants';
 
@@ -21,7 +22,7 @@ function action({ store, fetch, req }) {
   return {
     chunks: ['kanban'],
     title: 'Emails',
-    component: <Layout><Board /><Modal /><LabelSelector /></Layout>,
+    component: <Layout><Navigation /><Board /><Modal /><LabelSelector /></Layout>,
   };
 }
 
