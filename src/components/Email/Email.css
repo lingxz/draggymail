@@ -60,10 +60,26 @@
   color: #777;
 }
 
+.attachment {
+  background: #eee;
+  border-color: #e3e3e3;
+  border-radius: 4px;
+  padding: 4px 4px 4px 8px;
+  width: 100%;
+  line-height: 36px;
+  cursor: pointer;
+}
+
+.attachment i {
+  font-size: 16px !important;
+  margin-right: 8px !important;
+}
+
 :global {
 /*Make quoted replies a small block*/
   .gmail_extra {
     height: 30px;
+    width: 20px;
     overflow:hidden;
     display:block;
   }

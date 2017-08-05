@@ -10,6 +10,7 @@ class Thread extends React.Component {
     closeEmailModal: PropTypes.func,
     archiveThread: PropTypes.func,
     trashThread: PropTypes.func,
+    user: PropTypes.object,
   }
 
   constructor(props) {
@@ -38,7 +39,7 @@ class Thread extends React.Component {
   }
 
   render() {
-    const { thread, closeEmailModal } = this.props;
+    const { thread, closeEmailModal, user } = this.props;
     const emails = thread.emails;
     const gmailUrl = "https://mail.google.com/mail/u/0/#all/" + thread.id;
     console.log(emails.length);
@@ -58,6 +59,7 @@ class Thread extends React.Component {
         <div id="content" className={s.emails}>
           {emails && emails.map((item, i) =>
             <Email
+              user={user}
               key={i}
               email={item}
               last={i===emails.length-1}

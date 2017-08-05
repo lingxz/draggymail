@@ -89,8 +89,9 @@ app.use('/api', isAuthenticated, isAuthorized, apiRouter);
 app.get('/login/google',
   passport.authenticate('google', {
     scope: [
-    'https://www.googleapis.com/auth/plus.login',
-    'https://www.googleapis.com/auth/gmail.modify',
+      // 'https://www.googleapis.com/auth/plus.login',
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/gmail.modify',
     ],
     accessType: 'offline',
     session: true })

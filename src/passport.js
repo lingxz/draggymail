@@ -87,7 +87,7 @@ passport.use(new GoogleStrategy({
           expiryTime: expiryTime,
         });
       } else {
-        let user = await User.findOne({ where: { email: profile._json.email } });
+        let user = await User.findOne({ where: { email: profile.emails[0].value } });
         // should not find any user here
         console.log("there should not be any user");
         console.log(user);
@@ -95,7 +95,7 @@ passport.use(new GoogleStrategy({
         // new login, create new user, store refresh token
         // add default board and default label INBOX
         user = await User.create({
-          email: profile.email,
+          email: profile.emails[0].value,
           emailConfirmed: true,
           refreshToken: refreshToken,
           logins: [

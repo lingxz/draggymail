@@ -143,6 +143,32 @@ export function fetchManyMessages(user, messageIds) {
   return Promise.all(allFetches)
 }
 
+
+export function fetchAttachment(user, messageId, attachmentId) {
+  const url = "https://www.googleapis.com/gmail/v1/users/me/messages/" + messageId + "/attachments/" + attachmentId;
+  return fetch(url, {
+    method: 'GET',
+    headers: { "Authorization": "Bearer " + user.accessToken },
+  })
+    .then(response => {
+      if (response.status === 404) {
+        // somehow attachment doesn't exist, shouldn't happen
+        return { id: null }
+      } else {
+        return response.json()
+      }
+    })
+}
+
+export function fetchManyAttachments(user, messageId, attachmentIds) {
+  let allFetches = [];
+  for (var i = 0; i < attachmentIds.length; i++) {
+    let attachmentId = attachmentIds[i];
+    allFetches.push(fetchAttachment(user, messageId, attachmentId));
+  }
+  return Promise.all(allFetches)
+}
+
 /* **************************************************************************/
 // Modify Emails and messages
 /* **************************************************************************/

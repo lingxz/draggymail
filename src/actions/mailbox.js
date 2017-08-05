@@ -285,6 +285,58 @@ function getLatestHistoryId(labelsMap) {
   return Math.max(...historyIds).toString();
 }
 
+function fetchFullEmail(user, email) {
+  if (email.attachments) {
+    let attachmentIds = email.attachments.map(a => a.attachmentId);
+    let singleFetch = GmailActions.fetchManyAttachments(user, email.id, attachmentIds);
+    return singleFetch
+      .then(data => {
+        for (var i = 0; i < email.attachments.length; i++) {
+          email.attachments[i].size = data[i].size;
+          email.attachments[i].data = data[i].data;
+        }
+        return email;
+      })
+  } else {
+    return email;
+  }
+}
+
+function fetchFullEmails(user, emails) {
+  let allFetches = [];
+  for (var i = 0; i < emails.length; i++) {
+    allFetches.push(fetchFullEmail(user, emails[i]))
+  }
+  return Promise.all(allFetches);
+}
+
+// with attachments
+function fetchFullThreads(user, threadIds) {
+  return GmailActions.fetchManyThreads(user, threadIds)
+    .then(data => {
+      const threadFetches = [];
+      const formattedThreads = [];
+      for (var i = 0; i < data.length; i++) {
+        let thread = data[i];
+        let formattedThread = formatThread(thread);
+        formattedThreads.push(formattedThread);
+        let singleFetch = fetchFullEmails(user, formattedThread.emails)
+          // .then(data => {
+          //   formattedThread.emails = data;
+          //   formattedThreads.push(formattedThread);
+          // })
+        threadFetches.push(singleFetch)
+      }
+      return Promise.all(threadFetches)
+        .then(threadEmails => {
+          for (var i = 0; i < threadEmails.length; i++) {
+            formattedThreads[i].emails = threadEmails[i];
+          }
+          return formattedThreads;
+        })
+    })
+}
+
 export function fullSyncMultipleLabels(user, labelIds) {
   let allFetches = [];
   for (var i = 0; i < labelIds.length; i++) {
@@ -302,6 +354,7 @@ export function fullSyncMultipleLabels(user, labelIds) {
         return threadIds;
       })
       .then(threadIds => GmailActions.fetchManyThreads(user, threadIds))
+      // .then(threadIds => fetchFullThreads(user, threadIds))
     allFetches.push(threadFetch);
   }
   return Promise.all(allFetches)
@@ -309,6 +362,7 @@ export function fullSyncMultipleLabels(user, labelIds) {
       const labelsMap = {};
       for (var i = 0; i < data.length; i++) {
         labelsMap[labelIds[i]] = data[i].map(thread => formatThread(thread));
+        // labelsMap[labelIds[i]] = data[i];
       }
       return { latestHistoryId: getLatestHistoryId(labelsMap), labelsMap};
     })
@@ -431,6 +485,7 @@ export function partialSyncMailBox(user, labels, mailbox) {
       const allChangedMessageIdsSet = [...new Set(allChangedMessageIds)]
       // fetch and sort, returns a dictionary
       return GmailActions.fetchManyMessages(user, allChangedMessageIdsSet)
+        // .then(res => fetchFullEmails(user, res))
         .then(messages => {
           const labelIds = Object.keys(mailbox);
           const { messagesTrashed, messagesChanged, messagesRemovedFromLabels, messagesDeleted } = sortAndProcessMessages(messages, labelIds)

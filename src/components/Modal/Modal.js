@@ -16,6 +16,7 @@ function mapStateToProps(state) {
     showing: jsState.modal.showing,
     item: jsState.modal.item,
     labelId: jsState.modal.labelId,
+    user: jsState.user,
   };
 }
 
@@ -29,6 +30,7 @@ class Modal extends React.Component {
     showing: PropTypes.string,
     item: PropTypes.object,
     labelId: PropTypes.string,
+    user: PropTypes.object,
   }
 
   constructor(props) {
@@ -41,7 +43,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { isOpen, showing, item } = this.props;
+    const { isOpen, showing, item, user } = this.props;
 
     const style = {
       content: {
@@ -62,6 +64,7 @@ class Modal extends React.Component {
       >
         <Thread
           thread={item}
+          user={user}
           closeEmailModal={this.closeEmailModal}
           archiveThread={this.props.requestArchiveThread}
           trashThread={this.props.requestTrashThread}

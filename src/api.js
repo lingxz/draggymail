@@ -20,6 +20,9 @@ router.post('/google/refresh-token', (req, res) => {
     if (!req.user) {
       req.user = {}
     }
+    if (err) {
+      console.log("Refresh token error: ", err);
+    }
     req.user.accessToken = tokens.access_token;
     tokens.expiryTime = tokens.expiry_date;
     req.user.expiryTime = tokens.expiry_date;

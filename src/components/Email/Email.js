@@ -10,6 +10,7 @@ class Email extends React.Component {
   static propTypes = {
     email: PropTypes.object.isRequired,
     last: PropTypes.bool,
+    user: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -27,7 +28,7 @@ class Email extends React.Component {
   }
 
   render() {
-    const { email } = this.props;
+    const { email, user } = this.props;
     const { expanded } = this.state;
 
     const dateString = moment(Number(email.date)).calendar(null, {
@@ -65,8 +66,22 @@ class Email extends React.Component {
     let toLine = null;
     if (expanded) {
       const { recipientsList, recipientsListPrintable } = parseEmailHeadersTo(email.headers.to);
-      console.log(recipientsList);
       toLine = <div className={s.to}>to {recipientsListPrintable.join()}</div>
+    }
+
+
+    // show attachments
+    const attachments = [];
+    if (email.attachments) {
+      for (var i = 0; i < email.attachments.length; i++) {
+        let a = email.attachments[i];
+        let attachmentLink = "https://mail.google.com/mail/b/" + user.email + "/?ui=2&view=att&disp=safe&zw&th=" + email.id + "&attid=0." + (i+1).toString()
+        let item = {
+          filename: email.attachments[i].filename,
+          dataurl: attachmentLink,
+        }
+        attachments.push(item);
+      };
     }
 
     return (
@@ -78,6 +93,14 @@ class Email extends React.Component {
         { toLine }
         {expanded && <div className={s.emailBody}>
         { body }
+        {expanded && attachments.map((item, i) =>
+          <a key={i} href={item.dataurl}>
+            <div className={s.attachment}>
+              <i className="fa fa-paperclip" aria-hidden="true"></i>
+              <span>{item.filename}</span>
+            </div>
+          </a>
+        )}
         </div>}
       </div>
     );
