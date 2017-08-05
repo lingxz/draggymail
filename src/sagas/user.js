@@ -13,26 +13,24 @@ import {
   USER_LOGIN_FAILURE,
 } from '../constants';
 
-// not sure if passing fetch all the way down is the correct way to do it...but it works
-function* refreshAuth(user, fetch) {
-  while (true) {
-    yield call(delay, user.expiryTime - (new Date()).getTime() - 60 * 1000)
-    let newUser = yield call(MailBoxActions.refreshAuth, user, fetch)
-    yield put({ type: UPDATE_USER_CREDENTIALS, user: newUser })
-  }
-}
 
 export function* watchAuth({ fetch }) {
   while (true) {
     try {
-      yield take(USER_LOGIN);
-      const user = yield select(getUser);
-      yield race({
+      let user = yield select(getUser);
+      if (!user || !user.accessToken){
+        yield take(USER_LOGIN);
+      }
+      user = yield select(getUser);
+      const { expired } = yield race({
         logout: take(USER_LOGOUT),
-        refreshToken: call(refreshAuth, user, fetch)
+        expired: call(delay, user.expiryTime - (new Date().getTime() - 60 * 1000)),
       })
-      if (logout) {
+      if (!expired) {
         call(fetch, '/logout', { method: 'POST', redirect: 'follow', credentials: 'same-origin' })
+      } else {
+        let newUser = yield call(MailBoxActions.refreshAuth, user, fetch);
+        yield put({ type: UPDATE_USER_CREDENTIALS, user: newUser })
       }
     } catch (error) {
       console.log(error);
