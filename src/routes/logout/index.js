@@ -4,7 +4,7 @@ import { logout } from '../../actions/user';
 
 function action({ store }) {
   store.dispatch(logout())
-  return { redirect: '/login' }
+  return { redirect: '/' }
 }
 
 export default action;
