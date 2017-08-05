@@ -10,7 +10,7 @@ const initialState = fromJS({
   item: null,
 });
 
-export default function user(state = initialState, action) {
+export default function modal(state = initialState, action) {
   switch (action.type) {
     case OPEN_EMAIL_MODAL: {
       return state.withMutations((ctx) => {

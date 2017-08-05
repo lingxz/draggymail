@@ -4,8 +4,8 @@ import Card from '../Card/Card';
 
 const styles = {
   display: 'inline-block',
-  transform: 'rotate(-7deg)',
-  WebkitTransform: 'rotate(-7deg)'
+  // transform: 'rotate(-7deg)',
+  // WebkitTransform: 'rotate(-7deg)'
 };
 
 const propTypes = {

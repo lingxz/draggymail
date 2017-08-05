@@ -14,6 +14,7 @@ import {
   watchTrashThread,
   watchCreateLabel,
   watchRenameLabel,
+  watchEditLabels,
 } from './mailbox';
 
 export default function* rootSaga(context) {
@@ -32,5 +33,6 @@ export default function* rootSaga(context) {
     watchTrashThread(),
     watchCreateLabel(),
     watchRenameLabel(),
+    watchEditLabels(),
   ])
 }

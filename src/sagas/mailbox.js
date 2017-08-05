@@ -37,6 +37,9 @@ import {
   RENAME_LABEL_REQUEST,
   RENAME_LABEL_SUCCESS,
   RENAME_LABEL_FAILURE,
+  EDIT_LABELS_REQUEST,
+  EDIT_LABELS_SUCCESS,
+  EDIT_LABELS_FAILURE,
 } from '../constants';
 import * as MailBoxActions from '../actions/mailbox';
 import { getUser, getLabels, getLabelIds, getMailBox } from './selectors';
@@ -275,6 +278,17 @@ export function* renameLabel(action) {
   }
 }
 
+export function* editLabels(action) {
+  try {
+    const user = yield select(getUser);
+    const res = yield call(MailBoxActions.editThreadLabels, user, action.threadId, action.labelsToAdd, action.labelsToRemove)
+    yield put({ type: EDIT_LABELS_SUCCESS })
+  } catch(err) {
+    console.log(err);
+    yield put({ type: EDIT_LABELS_FAILURE })
+  }
+}
+
 export function* createLabel(action) {
   try {
     const user = yield select(getUser);
@@ -341,4 +355,8 @@ export function* watchCreateLabel() {
 
 export function* watchRenameLabel() {
   yield takeEvery(RENAME_LABEL_REQUEST, renameLabel)
+}
+
+export function* watchEditLabels() {
+  yield takeEvery(EDIT_LABELS_REQUEST, editLabels)
 }

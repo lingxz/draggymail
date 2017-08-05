@@ -60,7 +60,7 @@ class DraggableCard extends React.Component {
   }
 
 	render() {
-		const { isDragging, connectDragSource, item, labelId, markAsRead, triggerEmailModal } = this.props;
+		const { isDragging, connectDragSource, item, currentBoard, labelId, markAsRead, triggerEmailModal } = this.props;
 
 		return connectDragSource(
   		<div>
@@ -72,6 +72,8 @@ class DraggableCard extends React.Component {
           labelId={labelId}
           archiveThread={this.props.archiveThread}
           trashThread={this.props.trashThread}
+          toggleLabelSelector={this.props.toggleLabelSelector}
+          currentBoard={currentBoard}
         />
       </div>
 		)

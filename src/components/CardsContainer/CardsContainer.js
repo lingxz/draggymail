@@ -235,6 +235,7 @@ class CardsContainer extends React.Component {
             markAsRead={this.props.markAsRead}
             archiveThread={this.props.archiveThread}
             trashThread={this.props.trashThread}
+            toggleLabelSelector={this.props.toggleLabelSelector}
           />
         </div>
       </div>

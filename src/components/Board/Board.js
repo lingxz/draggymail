@@ -10,6 +10,7 @@ import s from './Board.css';
 import CardsContainer from '../CardsContainer';
 import PlaceholdCardsContainer from '../PlaceholdCardsContainer';
 import * as MailBoxActions from '../../actions/mailbox';
+import * as LabelSelectorActions from '../../actions/labelSelector';
 import CustomDragLayer from './CustomDragLayer';
 import { GMAIL_UNREAD_SYNC_MS, FETCH_ALL_MAILBOX_LABELS } from '../../constants';
 
@@ -25,7 +26,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(MailBoxActions, dispatch);
+  return bindActionCreators({...MailBoxActions, ...LabelSelectorActions}, dispatch);
 }
 
 class Board extends React.Component {
@@ -188,6 +189,7 @@ class Board extends React.Component {
             trashThread={this.props.requestTrashThread}
             renameLabel={this.props.requestRenameLabel}
             createLabel={this.props.requestCreateLabel}
+            toggleLabelSelector={this.props.toggleLabelSelector}
             x={i}
           />
         )}

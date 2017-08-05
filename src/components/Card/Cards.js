@@ -109,22 +109,24 @@ class Cards extends React.Component {
   }
 
   render() {
-    const { connectDropTarget, x, cards, labelId, isOver, canDrop } = this.props;
+    const { connectDropTarget, x, cards, item, labelId, isOver, canDrop } = this.props;
     // const { placeholderIndex } = this.state;
     return connectDropTarget(
       <div className={s.root}>
-        {cards && cards.map((item, i) =>
+        {cards && cards.map((card, i) =>
           <Card
             labelId={labelId}
             x={x}
             y={i}
-            item={item}
-            key={item.id}
+            item={card}
+            key={card.id}
             stopScrolling={this.props.stopScrolling}
             triggerEmailModal={this.props.triggerEmailModal}
             markAsRead={this.props.markAsRead}
             archiveThread={this.props.archiveThread}
             trashThread={this.props.trashThread}
+            toggleLabelSelector={this.props.toggleLabelSelector}
+            currentBoard={labelId}
           />
         )}
         { cards.length === 0 &&

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Card.css';
+import LabelSelector from '../LabelSelector';
 import { parseEmailHeader } from '../../utils';
 
 class Card extends React.Component {
@@ -20,6 +21,8 @@ class Card extends React.Component {
     this._handleDoubleClick = this._handleDoubleClick.bind(this);
     this._handleArchiveThread = this._handleArchiveThread.bind(this);
     this._handleTrashThread = this._handleTrashThread.bind(this);
+    this._toggleLabelSelector = this._toggleLabelSelector.bind(this);
+    this.state = { labelSelectorOpen: false }
   }
 
   _handleDoubleClick() {
@@ -37,9 +40,14 @@ class Card extends React.Component {
     const { item, trashThread } = this.props;
     trashThread(item.id)
   }
+  _toggleLabelSelector(e) {
+    const { item, toggleLabelSelector, currentBoard } = this.props;
+    this.props.toggleLabelSelector(item.id, item, e.pageX, e.pageY, item.labelIds, currentBoard)
+  }
 
 	render() {
 		const { style, item } = this.props;
+    const { labelSelectorOpen } = this.state;
     const gmailUrl = "https://mail.google.com/mail/u/0/#all/" + item.id;
 
 		return (
@@ -49,7 +57,7 @@ class Card extends React.Component {
           <div className={s.emailButtons}>
             <a><i title="Archive thread" className="fa fa-check" onClick={this._handleArchiveThread} aria-hidden="true"></i></a>
             <a><i title="Trash thread" className="fa fa-trash" onClick={this._handleTrashThread} aria-hidden="true"></i></a>
-            <a><i title="Change labels" className="fa fa-tag" aria-hidden="true"></i></a>
+            <a><i title="Change labels" className="fa fa-tag" onClick={this._toggleLabelSelector} aria-hidden="true"></i></a>
             <a title="Open in Gmail" href={gmailUrl} target="_blank"><i className="fa fa-envelope-o" aria-hidden="true"></i></a>
           </div>
         </div>

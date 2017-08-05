@@ -403,6 +403,10 @@ export function moveThread(user, threadId, labelToAdd, labelToRemove) {
   return GmailActions.changeLabels(user, threadId, labelsToAdd, labelsToRemove)
 }
 
+export function editThreadLabels(user, threadId, labelsToAdd, labelsToRemove) {
+  return GmailActions.changeLabels(user, threadId, labelsToAdd, labelsToRemove)
+}
+
 export function markAsRead(user, threadId) {
   const labelsToAdd = [];
   const labelsToRemove = ['UNREAD'];

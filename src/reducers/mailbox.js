@@ -15,6 +15,7 @@ import {
   ARCHIVE_THREAD_REQUEST,
   RENAME_LABEL_SUCCESS,
   CREATE_LABEL_SUCCESS,
+  EDIT_LABELS_REQUEST,
 } from '../constants';
 
 function getInsertIndexByDate(array, date) {
@@ -140,6 +141,51 @@ const initialState = new Map();
 
 export default function mailbox(state = initialState, action) {
   switch (action.type) {
+    case EDIT_LABELS_REQUEST: {
+      const jsState = state.toJS();
+      const { threadId, thread, labelsToAdd, labelsToRemove, newLabelsList, currentBoard } = action;
+      const currentLabels = Object.keys(jsState);
+      // these are the labels that are in the store that are added to thread
+      const toAddOverlap = labelsToAdd.filter(x => currentLabels.indexOf(x) > -1);
+      // labels in store that are removed from thread
+      const toRemoveOverlap = labelsToRemove.filter(x => currentLabels.indexOf(x) > -1);
+
+      const currentBoards = thread.labelIds.filter(x => currentLabels.indexOf(x) > -1);
+      for (var boardIndex = 0; boardIndex < currentBoards.length; boardIndex++) {
+        let board = jsState[currentBoards[boardIndex]];
+        for (var threadIdx = 0; threadIdx < board.threads.length; threadIdx++) {
+          if (board.threads[threadIdx].id === threadId) {
+            board.threads[threadIdx].labelIds = newLabelsList;
+            break;
+          }
+        }
+      }
+      if (toAddOverlap.length === 0 && toRemoveOverlap.length === 0) {
+        // no change
+        // need to change the labels
+        return fromJS(jsState);
+      }
+      // only handle add 1 first
+      if (toAddOverlap.length === 1) {
+        // add this thread to list
+        let addLabel = toAddOverlap[0];
+        const insertionIndex = getInsertIndexByDate(jsState[addLabel].threads, thread.date)
+        jsState[addLabel].threads.splice(insertionIndex, 0, thread);
+      }
+      // only handle remove one first
+      if (toRemoveOverlap.length === 1) {
+        let removeLabel = toRemoveOverlap[0];
+        for (var idx = 0; idx < jsState[removeLabel].threads.length; idx++) {
+          let currentThread = jsState[removeLabel].threads[idx];
+          if (currentThread.id === threadId) {
+            console.log("here????");
+            jsState[removeLabel].threads.splice(idx, 1);
+            break;
+          }
+        }
+      }
+      return fromJS(jsState);
+    }
     case CREATE_LABEL_SUCCESS: {
       const newLabel = action.newLabel;
       const newLabelItem = {
