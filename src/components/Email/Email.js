@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import sanitizeHtml from 'sanitize-html';
 import s from './Email.css';
+import EmailDetailsBox from '../EmailDetailsBox';
 import { parseEmailHeadersTo, parseEmailHeader } from '../../utils';
 import moment from 'moment';
 
@@ -16,9 +17,11 @@ class Email extends React.Component {
   constructor(props) {
     super(props);
     this.toggleExpanded = this.toggleExpanded.bind(this);
+    this._expandRecipientDetails = this._expandRecipientDetails.bind(this);
     this.state = {
       expanded: props.last,
       gmailExtraExpanded: false,
+      recipientDetailsExpanded: false,
     }
   }
 
@@ -27,9 +30,13 @@ class Email extends React.Component {
     console.log("toggle expanded!!!")
   }
 
+  _expandRecipientDetails() {
+    this.setState({ recipientDetailsExpanded: !this.state.recipientDetailsExpanded })
+  }
+
   render() {
     const { email, user } = this.props;
-    const { expanded } = this.state;
+    const { expanded, recipientDetailsExpanded } = this.state;
 
     const dateString = moment(Number(email.date)).calendar(null, {
       sameDay: '[Today] hh:mm a',
@@ -66,7 +73,7 @@ class Email extends React.Component {
     let toLine = null;
     if (expanded) {
       const { recipientsList, recipientsListPrintable } = parseEmailHeadersTo(email.headers.to);
-      toLine = <div className={s.to}>to {recipientsListPrintable.join()}</div>
+      toLine = <div className={s.to}>to {recipientsListPrintable.join()} <button onClick={this._expandRecipientDetails}>Expand</button></div>
     }
 
 
@@ -91,6 +98,11 @@ class Email extends React.Component {
           { fromLine }
         </div>
         { toLine }
+        {recipientDetailsExpanded &&
+          <EmailDetailsBox
+            email={email}
+          />
+        }
         {expanded && <div className={s.emailBody}>
         { body }
         {expanded && attachments.map((item, i) =>

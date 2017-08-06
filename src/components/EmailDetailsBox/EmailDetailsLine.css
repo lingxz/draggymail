@@ -1,0 +1,24 @@
+.root {
+  margin: 8px 0;
+  overflow: hidden;
+  display: -webkit-box;
+  display: box;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.left {
+  text-align: right;
+  width: 60px;
+  margin-right: 16px;
+  color: #999;
+  vertical-align: top;
+}
+
+.root span {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
