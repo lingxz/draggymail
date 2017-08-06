@@ -16,7 +16,7 @@ function action() {
 
   return {
     chunks: ['home'],
-    title: 'React Starter Kit',
+    title: 'Home',
     component: <Layout><Header /><LoginButton /></Layout>,
   };
 }

@@ -1,10 +1,11 @@
-# donemail
+# draggymail
 
 Drag your emails around like in trello boards.
 
 ## Introduction
 
 ### What it is
+- A kanban tool to organize your emails in Gmail
 - An alternative way to read and manage emails, tailored to my taste and preferences
 - A project for me to learn React and Redux concepts
 

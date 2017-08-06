@@ -23,7 +23,7 @@ class Header extends React.Component {
         <div className={s.container}>
           <div className={s.banner}>
             <img className={s.logo} src={check} />
-            <h1 className={s.bannerTitle}>donemail</h1>
+            <h1 className={s.bannerTitle}>draggymail</h1>
             <h2 className={s.bannerDesc}>email like how it should be done</h2>
           </div>
         </div>

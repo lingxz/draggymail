@@ -14,13 +14,20 @@ import { makeDir, moveDir, cleanDir } from './lib/fs';
 import run from './run';
 
 // GitHub Pages
+// const remote = {
+//   name: 'github',
+//   url: 'https://github.com/<user>/<repo>.git',
+//   branch: 'gh-pages',
+//   website: 'https://<user>.github.io/<repo>/',
+//   static: true,
+// };
+
 const remote = {
-  name: 'github',
-  url: 'https://github.com/<user>/<repo>.git',
-  branch: 'gh-pages',
-  website: 'https://<user>.github.io/<repo>/',
-  static: true,
-};
+  name: 'digitalocean',
+  url: "ssh://git@178.62.18.237/home/git/donemail.git",
+  branch: "master",
+  website: "https://donemail.theconfused.me"
+}
 
 // Heroku
 // const remote = {
@@ -99,8 +106,8 @@ async function deploy() {
   await spawn('git', ['push', remote.name, `master:${remote.branch}`, '--set-upstream'], options);
 
   // Check if the site was successfully deployed
-  const response = await fetch(remote.website);
-  console.info(`${remote.website} => ${response.status} ${response.statusText}`);
+  // const response = await fetch(remote.website);
+  // console.info(`${remote.website} => ${response.status} ${response.statusText}`);
 }
 
 export default deploy;
