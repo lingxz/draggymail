@@ -24,10 +24,10 @@ import run from './run';
 
 const remote = {
   name: 'digitalocean',
-  url: "ssh://git@178.62.18.237/home/git/donemail.git",
-  branch: "master",
-  website: "https://donemail.theconfused.me"
-}
+  url: 'ssh://git@178.62.18.237/home/git/draggymail.git',
+  branch: 'master',
+  website: 'https://draggymail.theconfused.me',
+};
 
 // Heroku
 // const remote = {
@@ -106,8 +106,8 @@ async function deploy() {
   await spawn('git', ['push', remote.name, `master:${remote.branch}`, '--set-upstream'], options);
 
   // Check if the site was successfully deployed
-  // const response = await fetch(remote.website);
-  // console.info(`${remote.website} => ${response.status} ${response.statusText}`);
+  const response = await fetch(remote.website);
+  console.info(`${remote.website} => ${response.status} ${response.statusText}`);
 }
 
 export default deploy;
