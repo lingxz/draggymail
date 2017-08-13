@@ -1,0 +1,17 @@
+.root {
+  margin: 0 auto;
+}
+
+.screenshot {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.bottom {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.screenshotImage {
+  box-shadow: 0 0 20px 2px lightgray;
+}

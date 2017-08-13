@@ -10,10 +10,8 @@
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
-import Link from '../Link';
-import Navigation from '../Navigation';
-import logoUrl from './logo-small.png';
-import logoUrl2x from './logo-small@2x.png';
+// import Link from '../Link';
+// import Navigation from '../Navigation';
 import check from './check.svg';
 
 class Header extends React.Component {
@@ -22,7 +20,7 @@ class Header extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <div className={s.banner}>
-            <img className={s.logo} src={check} />
+            <img className={s.logo} src={check} alt={logo} />
             <h1 className={s.bannerTitle}>draggymail</h1>
             <h2 className={s.bannerDesc}>email like how it should be done</h2>
           </div>

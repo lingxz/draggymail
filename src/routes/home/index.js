@@ -8,16 +8,14 @@
  */
 
 import React from 'react';
-import Header from '../../components/Header';
-import Layout from '../../components/KanbanLayout';
-import LoginButton from '../../components/LoginButton';
+import Layout from '../../components/Layout';
+import Home from './Home';
 
 function action() {
-
   return {
     chunks: ['home'],
     title: 'Home',
-    component: <Layout><Header /><LoginButton /></Layout>,
+    component: <Layout><Home title="Home" /></Layout>,
   };
 }
 

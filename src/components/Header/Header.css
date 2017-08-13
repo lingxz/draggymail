@@ -14,8 +14,9 @@
 }
 
 .root {
-  /*background: #373277;*/
-  /*color: #fff;*/
+  /* background: #373277; */
+
+  /* color: #fff; */
 }
 
 .container {
@@ -23,16 +24,6 @@
   padding: 20px 0;
   max-width: var(--max-content-width);
   animation: fadeInDown 1s;
-}
-
-.brand {
-  color: color(var(--brand-color) lightness(+10%));
-  text-decoration: none;
-  font-size: 1.75em; /* ~28px */
-}
-
-.brandTxt {
-  margin-left: 10px;
 }
 
 .banner {
@@ -45,6 +36,12 @@
   font-weight: normal;
   font-size: 5em;
   line-height: 1em;
+}
+
+@media screen and (max-width: 480px) {
+  .bannerTitle {
+    font-size: 3.5em;
+  }
 }
 
 .bannerDesc {
@@ -68,6 +65,7 @@ img {
     margin-top: -40px;
     opacity: 0;
   }
+
   to {
     margin-top: 40px;
     opacity: 1;

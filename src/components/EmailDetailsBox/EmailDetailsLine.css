@@ -1,8 +1,9 @@
 .root {
   margin: 8px 0;
   overflow: hidden;
-  display: -webkit-box;
-  display: box;
+
+  /*  display: -webkit-box;
+  display: box; */
   display: -webkit-flex;
   display: flex;
 }

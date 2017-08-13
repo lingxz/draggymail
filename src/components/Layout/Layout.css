@@ -18,14 +18,18 @@
 /*
  * Base styles
  * ========================================================================== */
+* {
+  box-sizing: border-box;
+}
 
 html {
-  color: #2E2D33;
+  color: #2e2d33;
   font-weight: 300;
-  /*font-size: 1em;*/
+
+  /* font-size: 1em; */
   font-family: var(--font-family-base);
   line-height: 1.375; /* ~22px */
-  background: #FBFAFB;
+  background: #fbfafb;
 }
 
 body {
